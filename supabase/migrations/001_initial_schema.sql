@@ -13,6 +13,7 @@ create table clients (
   revenue text,
   status text not null default 'lead'
     check (status in ('lead', 'call_scheduled', 'proposal', 'client', 'completed', 'lost')),
+  lead_score int,
   source text,
   preferred_contact text
     check (preferred_contact in ('imessage', 'whatsapp', 'email')),

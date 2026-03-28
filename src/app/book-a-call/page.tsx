@@ -337,6 +337,7 @@ export default function BookACallPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [pendingAdvance, setPendingAdvance] = useState(false);
   const [contentHeight, setContentHeight] = useState<number | "auto">("auto");
   const contentRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -426,6 +427,15 @@ export default function BookACallPage() {
     const p = getPrevStep(step, data);
     if (p) setStep(p);
   };
+
+  useEffect(() => {
+    if (!pendingAdvance) return;
+    setPendingAdvance(false);
+    const timeout = setTimeout(() => next(), 300);
+    return () => clearTimeout(timeout);
+  }, [pendingAdvance]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const autoAdvance = () => setPendingAdvance(true);
 
   const visibleSteps = FLOW.filter((s) => !shouldSkip(s, data));
   const currentStepIndex = visibleSteps.indexOf(step);
@@ -699,7 +709,7 @@ export default function BookACallPage() {
                       <ChoiceButton
                         key={option}
                         selected={data.howFound === option}
-                        onClick={() => update("howFound", option)}
+                        onClick={() => { update("howFound", option); autoAdvance(); }}
                         shortcut={String.fromCharCode(65 + i)}
                       >
                         {option}
@@ -782,7 +792,7 @@ export default function BookACallPage() {
                       <ChoiceButton
                         key={type}
                         selected={data.businessType === type}
-                        onClick={() => update("businessType", type)}
+                        onClick={() => { update("businessType", type); autoAdvance(); }}
                         shortcut={String.fromCharCode(65 + i)}
                       >
                         {type}
@@ -817,7 +827,7 @@ export default function BookACallPage() {
                       <ChoiceButton
                         key={option.key}
                         selected={data.teamSize === option.key}
-                        onClick={() => update("teamSize", option.key)}
+                        onClick={() => { update("teamSize", option.key); autoAdvance(); }}
                         shortcut={String.fromCharCode(65 + i)}
                       >
                         {option.label}
@@ -852,7 +862,7 @@ export default function BookACallPage() {
                       <ChoiceButton
                         key={option.key}
                         selected={data.aiExperience === option.key}
-                        onClick={() => update("aiExperience", option.key)}
+                        onClick={() => { update("aiExperience", option.key); autoAdvance(); }}
                         shortcut={String.fromCharCode(65 + i)}
                       >
                         {option.label}
@@ -923,7 +933,7 @@ export default function BookACallPage() {
                       <ChoiceButton
                         key={option.key}
                         selected={data.hoursWasted === option.key}
-                        onClick={() => update("hoursWasted", option.key)}
+                        onClick={() => { update("hoursWasted", option.key); autoAdvance(); }}
                         shortcut={String.fromCharCode(65 + i)}
                       >
                         {option.label}
@@ -974,7 +984,7 @@ export default function BookACallPage() {
                       <ChoiceButton
                         key={option.key}
                         selected={data.decisionMaker === option.key}
-                        onClick={() => update("decisionMaker", option.key)}
+                        onClick={() => { update("decisionMaker", option.key); autoAdvance(); }}
                         shortcut={String.fromCharCode(65 + i)}
                       >
                         {option.label}
@@ -1009,7 +1019,7 @@ export default function BookACallPage() {
                       <ChoiceButton
                         key={option.key}
                         selected={data.timeline === option.key}
-                        onClick={() => update("timeline", option.key)}
+                        onClick={() => { update("timeline", option.key); autoAdvance(); }}
                         shortcut={String.fromCharCode(65 + i)}
                       >
                         {option.label}
@@ -1044,7 +1054,7 @@ export default function BookACallPage() {
                       <ChoiceButton
                         key={option.key}
                         selected={data.commitment === option.key}
-                        onClick={() => update("commitment", option.key)}
+                        onClick={() => { update("commitment", option.key); autoAdvance(); }}
                         shortcut={String.fromCharCode(65 + i)}
                       >
                         {option.label}
@@ -1077,7 +1087,7 @@ export default function BookACallPage() {
                       <ChoiceButton
                         key={range}
                         selected={data.revenue === range}
-                        onClick={() => update("revenue", range)}
+                        onClick={() => { update("revenue", range); autoAdvance(); }}
                         shortcut={String.fromCharCode(65 + i)}
                       >
                         {range}

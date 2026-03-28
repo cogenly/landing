@@ -8,6 +8,7 @@
 - **frontend** (blue) - Next.js pages, components, UI, forms
 - **git** (white) - commits, branches, PRs
 - **playwright** (cyan) - screenshots, visual verification (only when explicitly asked)
+- **netlify** (cyan) - deploy status, build logs, env vars, site management
 
 Everything Cogenly lives here. Marketing site, client operations, integrations, automations. Run `claude` from this directory to operate the business.
 
