@@ -9,7 +9,7 @@ import Link from "next/link";
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden pt-20">
+    <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden pt-16 sm:pt-20">
       <DotPattern
         className="[mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] opacity-40"
         width={20}

@@ -60,7 +60,7 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="bg-secondary/50 py-20 sm:py-24 lg:py-32"
+      className="bg-secondary/50 py-16 sm:py-24 lg:py-32"
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
         <BlurFade delay={0.1} inView>
@@ -77,7 +77,7 @@ export function HowItWorks() {
 
         <div
           ref={containerRef}
-          className="relative mt-16 flex flex-col items-center gap-12 lg:flex-row lg:justify-between lg:gap-0"
+          className="relative mt-16 flex flex-col items-center gap-8 lg:flex-row lg:justify-between lg:gap-0"
         >
           {steps.map((step, index) => (
             <BlurFade

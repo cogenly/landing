@@ -71,10 +71,10 @@ const TEAM_SIZE_BRANCH_QUESTIONS: Record<string, string> = {
 };
 
 const AI_EXPERIENCE = [
-  { label: "Yes, I've implemented them myself", key: "implemented" },
-  { label: "Yes, I've hired an agency", key: "agency" },
-  { label: "Not fully implemented yet", key: "stalled" },
-  { label: "No, I need help setting them up", key: "new" },
+  { label: "Yes, I've built some myself", key: "implemented" },
+  { label: "Yes, I've hired someone to build them", key: "agency" },
+  { label: "I've started but haven't finished", key: "stalled" },
+  { label: "No, this would be my first time", key: "new" },
   { label: "Other", key: "other" },
 ];
 
@@ -156,6 +156,7 @@ const REVENUE_RANGES = [
 const HOW_FOUND = [
   "YouTube",
   "Instagram",
+  "LinkedIn",
   "Someone referred me",
   "Google search",
   "Other",
@@ -164,6 +165,7 @@ const HOW_FOUND = [
 const HOW_FOUND_DETAIL_QUESTIONS: Record<string, string> = {
   YouTube: "Which video or topic brought you here?",
   Instagram: "What content caught your attention?",
+  LinkedIn: "What post or profile caught your attention?",
   "Someone referred me": "Who referred you?",
   "Google search": "What were you searching for?",
   Other: "How did you find us?",
@@ -582,7 +584,7 @@ export default function BookACallPage() {
                         value={data.firstName}
                         onChange={(e) => update("firstName", e.target.value)}
                         className={cn(
-                          "w-full rounded-lg border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary",
+                          "w-full rounded-lg border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary",
                           errors.firstName ? "border-red-400" : "border-border"
                         )}
                         placeholder="Alex"
@@ -601,7 +603,7 @@ export default function BookACallPage() {
                         value={data.email}
                         onChange={(e) => update("email", e.target.value)}
                         className={cn(
-                          "w-full rounded-lg border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary",
+                          "w-full rounded-lg border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary",
                           errors.email ? "border-red-400" : "border-border"
                         )}
                         placeholder="alex@company.com"
@@ -619,7 +621,7 @@ export default function BookACallPage() {
                         value={data.phone}
                         onChange={(e) => update("phone", e.target.value)}
                         className={cn(
-                          "w-full rounded-lg border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary",
+                          "w-full rounded-lg border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary",
                           errors.phone ? "border-red-400" : "border-border"
                         )}
                         placeholder="+1 (555) 000-0000"
@@ -707,7 +709,7 @@ export default function BookACallPage() {
                       onChange={(e) =>
                         update("howFoundDetail", e.target.value)
                       }
-                      className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
                       autoFocus={isDesktop}
                     />
@@ -722,7 +724,7 @@ export default function BookACallPage() {
                     <textarea
                       value={data.whyWork}
                       onChange={(e) => update("whyWork", e.target.value)}
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
                       autoFocus={isDesktop}
                     />
@@ -742,7 +744,7 @@ export default function BookACallPage() {
                         type="text"
                         value={data.bizName}
                         onChange={(e) => update("bizName", e.target.value)}
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                         autoFocus={isDesktop}
                       />
                     </div>
@@ -754,7 +756,7 @@ export default function BookACallPage() {
                         type="url"
                         value={data.bizWebsite}
                         onChange={(e) => update("bizWebsite", e.target.value)}
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                         placeholder="https://"
                       />
                     </div>
@@ -789,7 +791,7 @@ export default function BookACallPage() {
                       onChange={(e) =>
                         update("businessTypeOther", e.target.value)
                       }
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="What industry are you in, and what does your business do?"
                       autoFocus={isDesktop}
                     />
@@ -824,7 +826,7 @@ export default function BookACallPage() {
                       onChange={(e) =>
                         update("teamSizeBranch", e.target.value)
                       }
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
                       autoFocus={isDesktop}
                     />
@@ -834,7 +836,7 @@ export default function BookACallPage() {
                 {step === "ai-experience" && (
                   <div className="space-y-3">
                     <h2 className="mb-4 text-xl font-bold">
-                      What best describes your current use of AI / automation?
+                      Have you used AI or automation in your business before?
                     </h2>
                     {AI_EXPERIENCE.map((option, i) => (
                       <ChoiceButton
@@ -857,7 +859,7 @@ export default function BookACallPage() {
                     <textarea
                       value={data.aiBranch}
                       onChange={(e) => update("aiBranch", e.target.value)}
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
                       autoFocus={isDesktop}
                     />
@@ -872,7 +874,7 @@ export default function BookACallPage() {
                     <textarea
                       value={data.whatToBuild}
                       onChange={(e) => update("whatToBuild", e.target.value)}
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
                       autoFocus={isDesktop}
                     />
@@ -893,7 +895,7 @@ export default function BookACallPage() {
                       onChange={(e) =>
                         update("currentProcess", e.target.value)
                       }
-                      className="min-h-[150px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[150px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="First we... then... after that..."
                       autoFocus={isDesktop}
                     />
@@ -928,7 +930,7 @@ export default function BookACallPage() {
                       onChange={(e) =>
                         update("hoursWastedBranch", e.target.value)
                       }
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
                       autoFocus={isDesktop}
                     />
@@ -944,7 +946,7 @@ export default function BookACallPage() {
                     <textarea
                       value={data.success}
                       onChange={(e) => update("success", e.target.value)}
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
                       autoFocus={isDesktop}
                     />
@@ -979,7 +981,7 @@ export default function BookACallPage() {
                       onChange={(e) =>
                         update("decisionMakerBranch", e.target.value)
                       }
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
                       autoFocus={isDesktop}
                     />
@@ -1014,7 +1016,7 @@ export default function BookACallPage() {
                       onChange={(e) =>
                         update("timelineBranch", e.target.value)
                       }
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
                       autoFocus={isDesktop}
                     />
@@ -1047,7 +1049,7 @@ export default function BookACallPage() {
                     <textarea
                       value={data.concerns}
                       onChange={(e) => update("concerns", e.target.value)}
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
                       autoFocus={isDesktop}
                     />
@@ -1086,7 +1088,7 @@ export default function BookACallPage() {
                       onChange={(e) =>
                         update("availability", e.target.value)
                       }
-                      className="min-h-[100px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[100px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="e.g. Tuesday or Thursday afternoon, anytime after 2pm EST"
                       autoFocus={isDesktop}
                     />
@@ -1107,7 +1109,7 @@ export default function BookACallPage() {
                       onChange={(e) =>
                         update("anythingElse", e.target.value)
                       }
-                      className="min-h-[100px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className="min-h-[100px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
                       autoFocus={isDesktop}
                     />

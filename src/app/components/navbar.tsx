@@ -47,7 +47,7 @@ export function Navbar() {
     <header
       className={cn(
         "fixed top-0 z-50 w-full transition-all duration-500",
-        scrolled ? "px-4 pt-3 sm:px-6" : "px-0 pt-0"
+        scrolled ? "px-4 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6" : "px-0 pt-0"
       )}
     >
       <nav
@@ -120,11 +120,11 @@ export function Navbar() {
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
               className={cn(
-                "rounded-full p-2 transition-colors hover:bg-black/5 md:hidden",
+                "rounded-full p-2.5 transition-colors hover:bg-black/5 md:hidden",
                 !scrolled && "border border-border"
               )}
             >
-              <Menu className="h-4 w-4" />
+              <Menu className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent
               side="right"
@@ -142,7 +142,7 @@ export function Navbar() {
                       <a
                         href={link.href}
                         onClick={() => setOpen(false)}
-                        className="group flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium text-muted-foreground transition-all hover:bg-[oklch(0.62_0.18_250/0.05)] hover:text-foreground"
+                        className="group flex items-center gap-3 rounded-xl px-4 py-3.5 text-base font-medium text-muted-foreground transition-all hover:bg-[oklch(0.62_0.18_250/0.05)] hover:text-foreground"
                       >
                         <span className="h-1 w-1 rounded-full bg-[oklch(0.62_0.18_250)] opacity-0 transition-opacity group-hover:opacity-100" />
                         {link.label}
