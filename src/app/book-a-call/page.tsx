@@ -312,7 +312,7 @@ function ChoiceButton({
 
 function StepProgress({ current, total }: { current: number; total: number }) {
   return (
-    <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+    <div className="h-1 w-full animate-in fade-in duration-500 overflow-hidden rounded-full bg-muted">
       <div
         className="h-full rounded-full bg-primary transition-all duration-500"
         style={{ width: `${(current / total) * 100}%` }}

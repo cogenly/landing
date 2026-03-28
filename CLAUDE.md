@@ -1,43 +1,131 @@
 @AGENTS.md
 
-# Cogenly Landing Page
+# Cogenly Platform
 
-## What This Is
-Landing page for Cogenly, an AI systems implementation company. Cogenly builds AI systems that replace manual, repetitive work for businesses. Voice agents, workflow automation, document processing, internal tools.
+Everything Cogenly lives here. Marketing site, client operations, integrations, automations. Run `claude` from this directory to operate the business.
 
-This is NOT a SaaS product page. This is a services company page. The goal is to get business owners to book a discovery call.
+## Architecture
+
+### Stack
+
+| Layer | Tool | Purpose |
+|-------|------|---------|
+| Platform | Next.js (this repo) | Marketing site + future dashboard |
+| Data | Supabase | Clients, calls, diagnoses, projects |
+| Code | GitHub (`cogenly` org) | This repo + per-client repos |
+| Domain | Namecheap | cogenly.com |
+| Banking | Mercury | Business account + invoicing |
+| Acquisition | LinkedIn | Outreach + content |
+| Playbooks | Notion | Sales framework, offer stack, call prep |
+| AI Brain | Claude Code | Orchestration, automation, glue |
+
+### Repo Structure
+
+```
+platform/
+  CLAUDE.md
+  src/                     # Next.js app
+    app/
+      components/          # page sections (navbar, hero, services, etc.)
+      fonts/               # Open Sauce Sans (local)
+      page.tsx             # main landing page
+    components/ui/         # shadcn + magic-ui primitives
+    lib/
+      data.ts              # all marketing copy
+  supabase/
+    migrations/            # SQL schema migrations
+  clients/                 # per-client docs
+    <client-name>/
+      README.md            # everything known about client
+      transcripts/         # call transcripts (full text)
+      architecture/        # system design, decisions
+  templates/               # starters for client project repos
+  patterns/                # reusable solutions by vertical
+  scripts/                 # automation (onboarding, proposals)
+  public/                  # static assets (logo, etc.)
+```
+
+### Supabase Schema
+
+Tables: `clients`, `calls`, `diagnoses`, `projects`, `decisions`, `patterns`
+
+See `supabase/migrations/001_initial_schema.sql` for full schema.
+
+### What Lives Where
+
+| Data | Where | Why |
+|------|-------|-----|
+| Client info, status, pipeline | Supabase | Queryable, intake form writes here |
+| Call transcripts (full text) | Git `clients/<name>/transcripts/` | Long docs, Claude reads directly |
+| Call metadata (date, outcome) | Supabase `calls` table | Queryable |
+| Diagnosis responses | Supabase `diagnoses` table | Structured, cross-client queries |
+| Architecture decisions | Git `clients/<name>/architecture/` + Supabase | Detail in git, metadata in db |
+| Patterns | Git `patterns/` + Supabase | Detail in git, queryable in db |
+| Project status | Supabase `projects` table | Pipeline tracking |
+| Offers, sales framework | Notion | Low volume, already exists |
+| Marketing copy | `src/lib/data.ts` | Edit copy here, not in components |
 
 ## The Business
+
 - **What we do:** Build and deploy custom AI systems for businesses (voice agents, workflow automation, document processing, internal tools)
-- **Who we serve:** Any business with manual processes that need to die. Law firms, medical practices, agencies, e-commerce, professional services. Generalist for now, niching down later.
+- **Who we serve:** Any business with manual processes. Law firms, medical practices, agencies, e-commerce, professional services.
 - **Pricing:** $5-15k setup + $1.5-3k/month retainer
-- **Founder:** Alex Flekkas (CS @ UChicago, built MediaMaxxing platform, Claude Code content creator)
-- **Domain:** cogenly.com (not yet live)
+- **Founder:** Alex Flekkas (CS @ UChicago)
 
-## Positioning & Vibe
-- Clean, confident, slightly cheeky. Same energy as the Relay v1 site (mpcs-51238 project)
-- NOT corporate. NOT meme-y. Somewhere in between: professional but human
-- Direct copy that sounds like a person, not a brochure
-- "Your team is doing work a machine should be doing. We fix that." energy
-- The site should make a business owner think: "these people get it, I want to talk to them"
-- **No em dashes. Ever.** Use commas, periods, colons, or parentheses instead.
+## Client Lifecycle
 
-## Tech Stack
+```
+1. INTAKE
+   Prospect fills form on cogenly.com
+   > Writes to Supabase clients table (status: lead)
+   > Notification sent
+
+2. DISCOVERY CALL
+   > Record and transcribe call
+   > Save transcript: clients/<name>/transcripts/discovery_YYYYMMDD.md
+   > Log metadata to Supabase calls table
+   > Update client status: call_scheduled
+
+3. DIAGNOSIS
+   Client fills diagnosis form
+   > Writes to Supabase diagnoses table
+   > Claude reads diagnosis + transcript, generates proposal
+   > Update client status: proposal
+
+4. CLOSE & ONBOARD
+   > Create client dir in clients/
+   > Create cogenly/client-<name> repo from template
+   > Update Supabase status: client
+   > Send Mercury invoice (setup fee)
+
+5. BUILD & DELIVER
+   > Work in cogenly/client-<name> repo
+   > Log decisions in clients/<name>/architecture/
+   > Track project in Supabase
+
+6. RETAIN
+   > Monthly Mercury invoice (retainer)
+   > Check-in calls logged
+   > Patterns extracted to patterns/
+```
+
+## Tech Stack (Site)
+
 - Next.js 16 (App Router) / React 19 / TypeScript
 - Tailwind CSS v4 / shadcn/ui v4 / MagicUI
 - Font: Open Sauce Sans (local, `src/app/fonts/`) + Geist Mono (Google)
 - Package manager: **bun** (never npm)
 - Primary color: blue (`oklch(0.55 0.2 250)`)
-- Hosting: Vercel (planned)
+- Hosting: Netlify
 
-## Architecture
-- `src/app/page.tsx` -- main landing page, composes all section components
-- `src/app/components/` -- section components (navbar, hero, services, how-it-works, stats, faq, cta, footer)
-- `src/lib/data.ts` -- all copy, FAQ content, service descriptions, nav links, footer links. Edit copy here, not in components.
-- `src/components/ui/` -- shadcn + magic-ui primitives (don't edit these directly)
+## Design
 
-## Design Reference
-The v1 Relay site (`mpcs-51238-website.vercel.app/v1`) is the design reference. Same component patterns:
+- Clean, confident, slightly cheeky. Professional but human.
+- NOT corporate. NOT meme-y.
+- Direct copy that sounds like a person, not a brochure.
+- **No em dashes. Ever.** Use commas, periods, colons, or parentheses instead.
+
+### Design Reference
 - Floating glass navbar with backdrop blur
 - DotPattern backgrounds on hero and CTA sections
 - BlurFade entrance animations on all sections
@@ -46,21 +134,14 @@ The v1 Relay site (`mpcs-51238-website.vercel.app/v1`) is the design reference. 
 - ShimmerButton for primary CTAs
 - NumberTicker for stats
 - Accordion for FAQ
-- Marquee for testimonials (placeholder for now, will populate with real case studies)
 
-## Current State
-- All sections built and working
-- Copy is first draft from brainstorming session
-- Testimonials section intentionally minimal (one placeholder). Will populate after first client engagements.
-- Stats are aspirational/projected, not yet backed by real data. Update as real case studies come in.
-- CTAs link to mailto:alex@cogenly.com for now. Will switch to Calendly or Typeform once set up.
+## Conventions
 
-## What Comes Next
-- [ ] Buy cogenly.com domain
-- [ ] Deploy to Vercel
-- [ ] Set up Calendly and swap CTA links
-- [ ] Add real testimonials after Parsa and Jon engagements
-- [ ] Update stats with real numbers from first clients
-- [ ] Potentially add a "Case Studies" section once we have 2-3
-- [ ] Add og:image and social meta tags
-- [ ] Consider adding a "The Problem" section between hero and services
+- Client dirs: lowercase, hyphenated (`clients/parsa/`)
+- Client repos: `client-<company-name>` in cogenly org (private)
+- Supabase is source of truth for structured data
+- Git is source of truth for documents
+- Notion only for personal playbooks (sales framework, offers). NOT for client data.
+- Mercury for all invoicing
+- Every call recorded and transcribed
+- Every architecture decision documented with reasoning
