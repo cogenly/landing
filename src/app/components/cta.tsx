@@ -3,7 +3,7 @@
 import { BlurFade } from "@/components/ui/blur-fade";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { DotPattern } from "@/components/ui/dot-pattern";
-import { IntakeForm } from "./intake-form";
+import Link from "next/link";
 
 export function CTA() {
   return (
@@ -21,28 +21,28 @@ export function CTA() {
       <div className="relative z-10 mx-auto max-w-3xl px-6 text-center sm:px-8">
         <BlurFade delay={0.1} inView>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-            Ready to{" "}
-            <span className="text-primary">Build?</span>
+            Your competitors will automate eventually.{" "}
+            <span className="text-primary">Be first.</span>
           </h2>
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
           <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-            Tell us what you need automated. We will scope it, price it,
-            and give you an honest recommendation.
+            Tell us what you need automated. We'll scope it, price it,
+            and give you an honest answer. No fluff.
           </p>
         </BlurFade>
 
         <BlurFade delay={0.3} inView>
           <div className="mt-8">
-            <IntakeForm>
+            <Link href="/book-a-call">
               <ShimmerButton
                 className="mx-auto h-12 px-8 text-base font-medium"
                 background="oklch(0.62 0.18 250)"
               >
                 Book a Call
               </ShimmerButton>
-            </IntakeForm>
+            </Link>
             <p className="mt-4 text-sm text-muted-foreground">
               We respond within 24 hours.
             </p>

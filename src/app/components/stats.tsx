@@ -10,7 +10,7 @@ export function Stats() {
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
         <BlurFade delay={0.1} inView>
           <p className="mb-12 text-center text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            Results from real engagements
+            Built and proven in production
           </p>
         </BlurFade>
         <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">

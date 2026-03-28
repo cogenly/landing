@@ -11,19 +11,19 @@ const steps = [
     icon: Search,
     title: "Discovery",
     description:
-      "We audit your operations and identify where automation saves you the most time and money.",
+      "We find where AI saves you the most time and money. Not where it sounds cool. Where it actually matters.",
   },
   {
     icon: Wrench,
     title: "Build",
     description:
-      "We design, build, and deploy the system. Voice agents, document processing, workflow automation. Whatever the problem needs. Typically live within 2-4 weeks.",
+      "We design, build, and deploy the system. Whatever the problem needs. Typically live within 2-4 weeks.",
   },
   {
     icon: Rocket,
     title: "Maintain",
     description:
-      "We monitor, optimize, and improve the system monthly. Incident response is included.",
+      "We don't build and disappear. When something breaks at 2am, that's our problem, not yours.",
   },
 ];
 
