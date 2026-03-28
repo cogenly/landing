@@ -20,7 +20,7 @@ export function FAQ() {
               <span className="text-primary">Questions.</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Straight answers about how we work.
+              No fluff. No runaround.
             </p>
           </div>
         </BlurFade>

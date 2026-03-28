@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, type CSSProperties } from "react";
+import { useState, useEffect, useCallback, type CSSProperties } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { navLinks } from "@/lib/data";
@@ -14,15 +14,12 @@ function lerp(a: number, b: number, t: number) {
 }
 
 export function Navbar() {
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [open, setOpen] = useState(false);
-  const [transitioning, setTransitioning] = useState(false);
-  const transitionTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
   const handleScroll = useCallback(() => {
-    const progress = Math.min(1, Math.max(0, window.scrollY / 80));
-    setScrollProgress(progress);
+    setIsScrolled(window.scrollY > 20);
 
     const sections = navLinks
       .map((link) => link.href.replace("#", ""))
@@ -47,32 +44,28 @@ export function Navbar() {
   // Close menu on scroll
   useEffect(() => {
     if (!open) return;
-    const close = () => toggleMenu();
+    const close = () => setOpen(false);
     window.addEventListener("scroll", close, { passive: true });
     return () => window.removeEventListener("scroll", close);
   }, [open]);
 
   const toggleMenu = useCallback(() => {
-    setTransitioning(true);
     setOpen((v) => !v);
-    if (transitionTimer.current) clearTimeout(transitionTimer.current);
-    transitionTimer.current = setTimeout(() => setTransitioning(false), 350);
   }, []);
 
   // When menu is open, treat as fully scrolled
-  const sp = open ? 1 : scrollProgress;
+  const sp = (open || isScrolled) ? 1 : 0;
+
+  const ease = "all 0.6s cubic-bezier(0.22, 1, 0.36, 1)";
 
   const headerStyle: CSSProperties = {
     paddingLeft: lerp(0, 16, sp) + "px",
     paddingRight: lerp(0, 16, sp) + "px",
     paddingTop:
-      sp > 0.01
-        ? `max(${lerp(0, 12, sp)}px, env(safe-area-inset-top, 0px))`
+      sp > 0
+        ? `max(12px, env(safe-area-inset-top, 0px))`
         : "0px",
-    // Smooth transition when menu toggles, instant during scroll
-    transition: transitioning
-      ? "padding 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)"
-      : "none",
+    transition: `padding 0.6s cubic-bezier(0.22, 1, 0.36, 1)`,
   };
 
   const navStyle: CSSProperties = {
@@ -87,23 +80,20 @@ export function Navbar() {
     borderColor: `rgba(255, 255, 255, ${lerp(0, 0.2, sp)})`,
     paddingInline: lerp(24, 12, sp) + "px",
     paddingBlock: lerp(20, 8, sp) + "px",
-    // Smooth transition when menu toggles, instant during scroll
-    transition: transitioning
-      ? "all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)"
-      : "none",
+    transition: ease,
   };
 
-  // Hamburger button border opacity: fades out as you scroll
-  const buttonBorderOpacity = open ? 0 : Math.max(0, 1 - sp * 10);
+  // Hamburger button border opacity: visible at top, hidden when scrolled/open
+  const buttonBorderOpacity = (open || isScrolled) ? 0 : 1;
 
   return (
     <header className="fixed top-0 z-50 w-full" style={headerStyle}>
       <nav className="relative mx-auto" style={navStyle}>
         {/* Subtle blue glow on bottom edge */}
-        {sp > 0.8 && !open && (
+        {sp === 1 && !open && (
           <div
             className="pointer-events-none absolute inset-x-0 -bottom-px h-px"
-            style={{ opacity: (sp - 0.8) / 0.2 }}
+            style={{ opacity: 1 }}
           >
             <div className="mx-auto h-full w-2/3 bg-gradient-to-r from-transparent via-[oklch(0.62_0.18_250/0.4)] to-transparent" />
           </div>
@@ -149,7 +139,10 @@ export function Navbar() {
             <Link
               href="/book-a-call"
               className="hidden origin-right md:inline-flex"
-              style={{ transform: `scale(${lerp(1, 0.9, sp)})` }}
+              style={{
+                transform: `scale(${lerp(1, 0.9, sp)})`,
+                transition: "transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
+              }}
             >
               <ShimmerButton
                 className="group/cta h-9 px-5 py-1.5 text-sm font-semibold"
@@ -170,7 +163,7 @@ export function Navbar() {
                 borderWidth: "1px",
                 borderStyle: "solid",
                 borderColor: `var(--border-color, oklch(0.922 0 0 / ${buttonBorderOpacity}))`,
-                transition: "border-color 0.3s ease",
+                transition: "border-color 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
               }}
               aria-label={open ? "Close menu" : "Open menu"}
             >

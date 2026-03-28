@@ -29,7 +29,7 @@ export function Hero() {
 
         <BlurFade delay={0.5} inView>
           <p className="mt-4 max-w-2xl text-base text-muted-foreground sm:mx-auto sm:mt-6 sm:text-xl">
-            We automate the repetitive parts of your operation so your team can focus on what matters.
+            We build AI systems that give your team 20+ hours a week back. You keep the savings.
           </p>
         </BlurFade>
 

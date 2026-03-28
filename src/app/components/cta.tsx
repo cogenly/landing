@@ -22,15 +22,15 @@ export function CTA() {
       <div className="relative z-10 mx-auto max-w-3xl px-6 text-center sm:px-8">
         <BlurFade delay={0.1} inView>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-            Your competitors will automate eventually.{" "}
-            <span className="text-primary">Be first.</span>
+            Your team's time is worth more than this.{" "}
+            <span className="text-primary">Let's fix it.</span>
           </h2>
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
           <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-            Tell us what you need automated. We'll scope it, price it,
-            and give you an honest answer. No fluff.
+            Tell us what's eating up your team's hours. We'll show you
+            exactly how to get them back.
           </p>
         </BlurFade>
 

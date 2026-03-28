@@ -11,12 +11,12 @@ export function Services() {
         <BlurFade delay={0.1} inView>
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-              What We{" "}
-              <span className="text-primary">Build.</span>
+              What{" "}
+              <span className="text-primary">Changes.</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Custom AI systems scoped to your operation. Not off-the-shelf
-              tools. Not proof-of-concepts.
+              Every system we build is tied to a number. Hours saved, revenue
+              gained, or problems eliminated.
             </p>
           </div>
         </BlurFade>
@@ -37,12 +37,12 @@ export function Services() {
                 gradientTo="#93c5fd"
               >
                 <div className="relative h-full p-6">
-                  <span className="font-mono text-xs text-muted-foreground">
-                    {service.step}
+                  <span className="text-xs font-medium uppercase tracking-wider text-primary">
+                    {service.title}
                   </span>
                   <service.icon className="mt-4 h-10 w-10 text-primary" />
                   <h3 className="mt-4 text-lg font-semibold">
-                    {service.title}
+                    {service.outcome}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     {service.description}

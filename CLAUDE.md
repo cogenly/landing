@@ -2,6 +2,13 @@
 
 # Cogenly Platform
 
+## Agents
+
+- **supabase** (green) - all database work, migrations, server actions, queries
+- **frontend** (blue) - Next.js pages, components, UI, forms
+- **git** (white) - commits, branches, PRs
+- **playwright** (cyan) - screenshots, visual verification
+
 Everything Cogenly lives here. Marketing site, client operations, integrations, automations. Run `claude` from this directory to operate the business.
 
 ## Architecture

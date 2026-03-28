@@ -9,21 +9,21 @@ import { cn } from "@/lib/utils";
 const steps = [
   {
     icon: Search,
-    title: "Discovery",
+    title: "Find the Money",
     description:
-      "We find where AI saves you the most time and money. Not where it sounds cool. Where it actually matters.",
+      "We audit your operation and find where AI saves you the most time and money. Not where it sounds cool. Where it hits your bottom line.",
   },
   {
     icon: Wrench,
-    title: "Build",
+    title: "Build and Ship",
     description:
-      "We design, build, and deploy the system. Whatever the problem needs. Typically live within 2-4 weeks.",
+      "We design, build, and deploy your system. Scoped tight, tested hard, live within 2-4 weeks. You see results before your next board meeting.",
   },
   {
     icon: Rocket,
-    title: "Maintain",
+    title: "Keep It Running",
     description:
-      "We don't build and disappear. When something breaks at 2am, that's our problem, not yours.",
+      "2am outage? Our problem. We monitor, optimize, and improve the system on an ongoing basis. You never think about it.",
   },
 ];
 
