@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, type CSSProperties } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { navLinks } from "@/lib/data";
@@ -9,13 +9,18 @@ import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { Logo } from "./logo";
 import Link from "next/link";
 
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
+
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
   const [open, setOpen] = useState(false);
 
   const handleScroll = useCallback(() => {
-    setScrolled(window.scrollY > 50);
+    const progress = Math.min(1, Math.max(0, window.scrollY / 80));
+    setScrollProgress(progress);
 
     const sections = navLinks
       .map((link) => link.href.replace("#", ""))
@@ -45,29 +50,41 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", close);
   }, [open]);
 
+  // When menu is open, treat as fully scrolled
+  const sp = open ? 1 : scrollProgress;
+
+  const headerStyle: CSSProperties = {
+    paddingLeft: lerp(0, 16, sp) + "px",
+    paddingRight: lerp(0, 16, sp) + "px",
+    paddingTop:
+      sp > 0.01
+        ? `max(${lerp(0, 12, sp)}px, env(safe-area-inset-top, 0px))`
+        : "0px",
+  };
+
+  const navStyle: CSSProperties = {
+    maxWidth: lerp(80, 48, sp) + "rem",
+    borderRadius: lerp(0, 24, sp) + "px",
+    backgroundColor: `rgba(255, 255, 255, ${lerp(0, 0.7, sp)})`,
+    backdropFilter: `blur(${lerp(0, 40, sp)}px) saturate(${lerp(100, 150, sp)}%)`,
+    WebkitBackdropFilter: `blur(${lerp(0, 40, sp)}px) saturate(${lerp(100, 150, sp)}%)`,
+    boxShadow: `0 10px 15px -3px rgba(0, 0, 0, ${lerp(0, 0.03, sp)})`,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: `rgba(255, 255, 255, ${lerp(0, 0.2, sp)})`,
+    paddingInline: lerp(24, 12, sp) + "px",
+    paddingBlock: lerp(20, 8, sp) + "px",
+  };
+
   return (
-    <header
-      className={cn(
-        "fixed top-0 z-50 w-full transition-all duration-500",
-        scrolled || open
-          ? "px-4 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6"
-          : "px-0 pt-0"
-      )}
-    >
-      <nav
-        className={cn(
-          "relative mx-auto transition-all",
-          scrolled || open
-            ? cn(
-                "max-w-3xl border border-white/20 bg-white/70 px-3 py-2 shadow-lg shadow-black/[0.03] backdrop-blur-2xl backdrop-saturate-150",
-                open ? "rounded-[20px] duration-200" : "rounded-full duration-500"
-              )
-            : "max-w-7xl border-b border-transparent bg-transparent px-6 py-5 duration-500 sm:px-8 lg:px-12"
-        )}
-      >
-        {/* Subtle blue glow on bottom edge when scrolled & closed */}
-        {scrolled && !open && (
-          <div className="pointer-events-none absolute inset-x-0 -bottom-px h-px">
+    <header className="fixed top-0 z-50 w-full" style={headerStyle}>
+      <nav className="relative mx-auto" style={navStyle}>
+        {/* Subtle blue glow on bottom edge */}
+        {sp > 0.8 && !open && (
+          <div
+            className="pointer-events-none absolute inset-x-0 -bottom-px h-px"
+            style={{ opacity: (sp - 0.8) / 0.2 }}
+          >
             <div className="mx-auto h-full w-2/3 bg-gradient-to-r from-transparent via-[oklch(0.62_0.18_250/0.4)] to-transparent" />
           </div>
         )}
@@ -112,10 +129,10 @@ export function Navbar() {
           <div className="relative z-10 flex items-center gap-2">
             <Link
               href="/book-a-call"
-              className={cn(
-                "hidden origin-right transition-transform duration-500 md:inline-flex",
-                scrolled ? "scale-90" : "scale-100"
-              )}
+              className="hidden origin-right md:inline-flex"
+              style={{
+                transform: `scale(${lerp(1, 0.9, sp)})`,
+              }}
             >
               <ShimmerButton
                 className="group/cta h-9 px-5 py-1.5 text-sm font-semibold"
@@ -131,7 +148,7 @@ export function Navbar() {
               onClick={() => setOpen((v) => !v)}
               className={cn(
                 "relative rounded-full p-2.5 transition-colors hover:bg-black/5 md:hidden",
-                !scrolled && !open && "border border-border"
+                sp < 0.1 && !open && "border border-border"
               )}
               aria-label={open ? "Close menu" : "Open menu"}
             >

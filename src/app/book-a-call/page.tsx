@@ -334,13 +334,8 @@ export default function BookACallPage() {
   const [step, setStep] = useState<Step>("intro");
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [contentHeight, setContentHeight] = useState<number | "auto">("auto");
-  const [isDesktop, setIsDesktop] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setIsDesktop(window.innerWidth >= 768);
-  }, []);
 
   useEffect(() => {
     if (!innerRef.current) return;
@@ -485,13 +480,13 @@ export default function BookACallPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-50 flex items-center gap-4 bg-background/80 px-6 py-4 backdrop-blur-lg">
+      <header className="flex items-center gap-4 px-6 py-5">
         <Link href="/" className="shrink-0">
           <Logo />
         </Link>
         <div className="flex-1" />
         {step !== "intro" && step !== "done" && (
-          <div className="w-36 sm:w-72 md:w-96">
+          <div className="hidden sm:block sm:w-72 md:w-96">
             <StepProgress current={currentStepIndex} total={totalSteps} />
           </div>
         )}
@@ -501,7 +496,7 @@ export default function BookACallPage() {
           className="group/link flex shrink-0 items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowUpLeft className="h-4 w-4 transition-transform group-hover/link:-translate-x-0.5 group-hover/link:-translate-y-0.5" />
-          <span className="hidden sm:inline">Back to site</span>
+          Back to site
         </Link>
       </header>
 
@@ -530,6 +525,11 @@ export default function BookACallPage() {
             </div>
           ) : (
             <div className="flex flex-col gap-6">
+              {step !== "intro" && (
+                <div className="sm:hidden">
+                  <StepProgress current={currentStepIndex} total={totalSteps} />
+                </div>
+              )}
               <div
                 ref={contentRef}
                 className="transition-[height] duration-300 ease-in-out"
@@ -583,7 +583,7 @@ export default function BookACallPage() {
                           errors.firstName ? "border-red-400" : "border-border"
                         )}
                         placeholder="Alex"
-                        autoFocus={isDesktop}
+                        autoFocus
                       />
                       {errors.firstName && (
                         <p className="mt-1 text-xs text-red-500">{errors.firstName}</p>
@@ -706,7 +706,7 @@ export default function BookACallPage() {
                       }
                       className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
@@ -721,7 +721,7 @@ export default function BookACallPage() {
                       onChange={(e) => update("whyWork", e.target.value)}
                       className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
@@ -740,7 +740,7 @@ export default function BookACallPage() {
                         value={data.bizName}
                         onChange={(e) => update("bizName", e.target.value)}
                         className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                        autoFocus={isDesktop}
+                        autoFocus
                       />
                     </div>
                     <div>
@@ -788,7 +788,7 @@ export default function BookACallPage() {
                       }
                       className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="What industry are you in, and what does your business do?"
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
@@ -823,7 +823,7 @@ export default function BookACallPage() {
                       }
                       className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
@@ -856,7 +856,7 @@ export default function BookACallPage() {
                       onChange={(e) => update("aiBranch", e.target.value)}
                       className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
@@ -871,7 +871,7 @@ export default function BookACallPage() {
                       onChange={(e) => update("whatToBuild", e.target.value)}
                       className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
@@ -892,7 +892,7 @@ export default function BookACallPage() {
                       }
                       className="min-h-[150px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="First we... then... after that..."
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
@@ -929,7 +929,7 @@ export default function BookACallPage() {
                       }
                       className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
@@ -945,7 +945,7 @@ export default function BookACallPage() {
                       onChange={(e) => update("success", e.target.value)}
                       className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
@@ -980,7 +980,7 @@ export default function BookACallPage() {
                       }
                       className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
@@ -1015,7 +1015,7 @@ export default function BookACallPage() {
                       }
                       className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
@@ -1048,7 +1048,7 @@ export default function BookACallPage() {
                       onChange={(e) => update("concerns", e.target.value)}
                       className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
@@ -1088,7 +1088,7 @@ export default function BookACallPage() {
                       }
                       className="min-h-[100px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
                       placeholder="Type your answer here..."
-                      autoFocus={isDesktop}
+                      autoFocus
                     />
                   </div>
                 )}
