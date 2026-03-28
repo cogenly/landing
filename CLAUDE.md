@@ -8,7 +8,7 @@
 - **frontend** (blue) - Next.js pages, components, UI, forms
 - **git** (white) - commits, branches, PRs
 - **playwright** (cyan) - screenshots, visual verification (only when explicitly asked)
-- **netlify** (cyan) - deploy status, build logs, env vars, site management
+- **cloudflare** (cyan) - deploy status, build logs, env vars, site management
 
 Everything Cogenly lives here. Marketing site, client operations, integrations, automations. Run `claude` from this directory to operate the business.
 
@@ -21,7 +21,7 @@ Everything Cogenly lives here. Marketing site, client operations, integrations, 
 | Platform | Next.js (this repo) | Marketing site + admin dashboard |
 | Data | Supabase | Clients, calls, projects, intake submissions |
 | Code | GitHub (`cogenly` org) | This repo + per-client repos |
-| Domain | Namecheap | cogenly.com |
+| Domain | Cloudflare Registrar | cogenly.com |
 | Banking | Mercury | Business account + invoicing |
 | Acquisition | LinkedIn | Outreach + content |
 | Playbooks | Notion | Sales framework, offer stack, call prep |
@@ -139,7 +139,7 @@ See `supabase/migrations/` for full schema. Key migrations:
 - Font: Open Sauce Sans (local, `src/app/fonts/`) + Geist Mono (Google)
 - Package manager: **bun** (never npm)
 - Primary color: blue (`oklch(0.55 0.2 250)`)
-- Hosting: Netlify
+- Hosting: Cloudflare (Workers + Pages via OpenNext)
 
 ## Design
 

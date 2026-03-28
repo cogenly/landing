@@ -13,11 +13,11 @@ export async function GET(request: Request) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user?.email?.endsWith("@cogenly.com")) {
         await supabase.auth.signOut();
-        return NextResponse.redirect(`${origin}/login?error=unauthorized_domain`);
+        return NextResponse.redirect(`${origin}/?error=unauthorized_domain`);
       }
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+  return NextResponse.redirect(`${origin}/?error=auth_callback_failed`);
 }

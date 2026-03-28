@@ -105,7 +105,6 @@ export const footerLinks = {
     { label: "FAQ", href: "#faq" },
   ],
   portal: [
-    { label: "Admin Login", href: "/login" },
     { label: "Dashboard", href: "/dashboard" },
   ],
 };

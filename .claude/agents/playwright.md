@@ -1,7 +1,7 @@
 ---
 name: playwright
 description: "Use this agent for all browser automation: taking screenshots, verifying UI, checking layouts, reproducing visual bugs, and smoke-testing pages."
-model: haiku
+model: sonnet
 color: cyan
 ---
 

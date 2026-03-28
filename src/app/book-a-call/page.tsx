@@ -341,6 +341,7 @@ export default function BookACallPage() {
   const [contentHeight, setContentHeight] = useState<number | "auto">("auto");
   const contentRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
+  const formStartTime = useRef<number>(Date.now());
 
   useEffect(() => {
     if (!innerRef.current) return;
@@ -414,7 +415,17 @@ export default function BookACallPage() {
     if (nextStep === "done") {
       setSubmitting(true);
       setSubmitError(null);
-      const result = await submitIntake(data);
+      const metadata = {
+        durationSeconds: Math.round((Date.now() - formStartTime.current) / 1000),
+        referrer: document.referrer || null,
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        screenWidth: window.screen.width,
+        screenHeight: window.screen.height,
+        url: window.location.href,
+      };
+      const result = await submitIntake(data, metadata);
       setSubmitting(false);
       if (result.error) {
         setSubmitError(result.error);

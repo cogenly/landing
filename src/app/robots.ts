@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/dashboard/", "/login", "/signup", "/auth/"],
+        disallow: ["/dashboard/", "/auth/"],
       },
     ],
     sitemap: "https://cogenly.com/sitemap.xml",

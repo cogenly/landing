@@ -14,6 +14,7 @@ create table clients (
   status text not null default 'lead'
     check (status in ('lead', 'call_scheduled', 'proposal', 'client', 'completed', 'lost')),
   lead_score int,
+  metadata jsonb,
   source text,
   preferred_contact text
     check (preferred_contact in ('imessage', 'whatsapp', 'email')),
