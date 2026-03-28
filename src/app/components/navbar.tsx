@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, type CSSProperties } from "react";
+import { useState, useEffect, useCallback, useRef, type CSSProperties } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { navLinks } from "@/lib/data";
@@ -17,6 +17,8 @@ export function Navbar() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
   const [open, setOpen] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+  const transitionTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
   const handleScroll = useCallback(() => {
     const progress = Math.min(1, Math.max(0, window.scrollY / 80));
@@ -45,10 +47,17 @@ export function Navbar() {
   // Close menu on scroll
   useEffect(() => {
     if (!open) return;
-    const close = () => setOpen(false);
+    const close = () => toggleMenu();
     window.addEventListener("scroll", close, { passive: true });
     return () => window.removeEventListener("scroll", close);
   }, [open]);
+
+  const toggleMenu = useCallback(() => {
+    setTransitioning(true);
+    setOpen((v) => !v);
+    if (transitionTimer.current) clearTimeout(transitionTimer.current);
+    transitionTimer.current = setTimeout(() => setTransitioning(false), 350);
+  }, []);
 
   // When menu is open, treat as fully scrolled
   const sp = open ? 1 : scrollProgress;
@@ -60,6 +69,10 @@ export function Navbar() {
       sp > 0.01
         ? `max(${lerp(0, 12, sp)}px, env(safe-area-inset-top, 0px))`
         : "0px",
+    // Smooth transition when menu toggles, instant during scroll
+    transition: transitioning
+      ? "padding 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)"
+      : "none",
   };
 
   const navStyle: CSSProperties = {
@@ -74,7 +87,14 @@ export function Navbar() {
     borderColor: `rgba(255, 255, 255, ${lerp(0, 0.2, sp)})`,
     paddingInline: lerp(24, 12, sp) + "px",
     paddingBlock: lerp(20, 8, sp) + "px",
+    // Smooth transition when menu toggles, instant during scroll
+    transition: transitioning
+      ? "all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)"
+      : "none",
   };
+
+  // Hamburger button border opacity: fades out as you scroll
+  const buttonBorderOpacity = open ? 0 : Math.max(0, 1 - sp * 10);
 
   return (
     <header className="fixed top-0 z-50 w-full" style={headerStyle}>
@@ -91,7 +111,6 @@ export function Navbar() {
 
         {/* Top bar */}
         <div className="flex items-center justify-between">
-          {/* Logo */}
           <a href="#" className="relative z-10 shrink-0">
             <Logo />
           </a>
@@ -130,9 +149,7 @@ export function Navbar() {
             <Link
               href="/book-a-call"
               className="hidden origin-right md:inline-flex"
-              style={{
-                transform: `scale(${lerp(1, 0.9, sp)})`,
-              }}
+              style={{ transform: `scale(${lerp(1, 0.9, sp)})` }}
             >
               <ShimmerButton
                 className="group/cta h-9 px-5 py-1.5 text-sm font-semibold"
@@ -144,12 +161,17 @@ export function Navbar() {
             </Link>
 
             {/* Mobile hamburger / close */}
-            <button
-              onClick={() => setOpen((v) => !v)}
-              className={cn(
-                "relative rounded-full p-2.5 transition-colors hover:bg-black/5 md:hidden",
-                sp < 0.1 && !open && "border border-border"
-              )}
+            <motion.button
+              onClick={toggleMenu}
+              whileTap={{ scale: 0.85 }}
+              transition={{ type: "spring", damping: 15, stiffness: 400 }}
+              className="relative rounded-full p-2.5 md:hidden"
+              style={{
+                borderWidth: "1px",
+                borderStyle: "solid",
+                borderColor: `var(--border-color, oklch(0.922 0 0 / ${buttonBorderOpacity}))`,
+                transition: "border-color 0.3s ease",
+              }}
               aria-label={open ? "Close menu" : "Open menu"}
             >
               <span className="relative block h-5 w-5">
@@ -170,7 +192,7 @@ export function Navbar() {
                   <X className="h-5 w-5" />
                 </motion.span>
               </span>
-            </button>
+            </motion.button>
           </div>
         </div>
 
@@ -178,12 +200,13 @@ export function Navbar() {
         <AnimatePresence>
           {open && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
+              initial={{ height: 0 }}
+              animate={{ height: "auto" }}
+              exit={{ height: 0 }}
               transition={{
-                height: { type: "spring", damping: 24, stiffness: 380 },
-                opacity: { duration: 0.2 },
+                type: "spring",
+                damping: 20,
+                stiffness: 300,
               }}
               className="overflow-hidden md:hidden"
             >
@@ -192,15 +215,15 @@ export function Navbar() {
                   <motion.a
                     key={link.href}
                     href={link.href}
-                    onClick={() => setOpen(false)}
-                    initial={{ opacity: 0, y: -8 }}
+                    onClick={toggleMenu}
+                    initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
+                    exit={{ opacity: 0, y: -6 }}
                     transition={{
-                      delay: 0.03 * i,
+                      delay: 0.04 * i,
                       type: "spring",
-                      damping: 28,
-                      stiffness: 400,
+                      damping: 22,
+                      stiffness: 350,
                     }}
                     className="rounded-xl px-4 py-3 text-[15px] font-medium text-muted-foreground transition-colors hover:bg-black/5 hover:text-foreground"
                   >
@@ -210,17 +233,17 @@ export function Navbar() {
 
                 <motion.div
                   className="px-3 pt-2"
-                  initial={{ opacity: 0, y: -8 }}
+                  initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
+                  exit={{ opacity: 0, y: -6 }}
                   transition={{
-                    delay: 0.03 * navLinks.length,
+                    delay: 0.04 * navLinks.length,
                     type: "spring",
-                    damping: 28,
-                    stiffness: 400,
+                    damping: 22,
+                    stiffness: 350,
                   }}
                 >
-                  <Link href="/book-a-call" onClick={() => setOpen(false)}>
+                  <Link href="/book-a-call" onClick={toggleMenu}>
                     <ShimmerButton
                       className="group/cta h-11 w-full text-sm font-semibold"
                       background="oklch(0.62 0.18 250)"
