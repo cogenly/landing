@@ -17,7 +17,7 @@ export function Hero() {
         cr={1}
       />
 
-      <div className="relative z-10 mx-auto max-w-4xl px-6 text-center sm:px-8">
+      <div className="relative z-10 mx-auto max-w-4xl px-6 text-left sm:px-8 sm:text-center">
         <BlurFade delay={0.1} inView>
           <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-7xl">
             Your team is doing work{" "}
@@ -28,18 +28,16 @@ export function Hero() {
         </BlurFade>
 
         <BlurFade delay={0.5} inView>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-            We build AI systems that replace the manual, repetitive,
-            soul-crushing parts of your operation. If a human is doing it
-            on autopilot, we can automate it.
+          <p className="mt-4 max-w-2xl text-base text-muted-foreground sm:mx-auto sm:mt-6 sm:text-xl">
+            We automate the repetitive parts of your operation so your team can focus on what matters.
           </p>
         </BlurFade>
 
         <BlurFade delay={0.65} inView>
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="mt-8 flex flex-row items-center gap-3 sm:mt-10 sm:justify-center sm:gap-4">
             <Link href="/book-a-call">
               <ShimmerButton
-                className="group/cta h-12 px-8 text-base font-medium"
+                className="group/cta h-12 px-6 text-sm font-medium sm:px-8 sm:text-base"
                 background="oklch(0.62 0.18 250)"
               >
                 Book a Call
@@ -49,9 +47,9 @@ export function Hero() {
             <Button
               variant="outline"
               size="lg"
-              className="h-12 rounded-full px-8"
+              className="h-12 rounded-full px-6 sm:px-8"
             >
-              <a href="#how-it-works">See How It Works</a>
+              <a href="#how-it-works">How It Works</a>
             </Button>
           </div>
         </BlurFade>
