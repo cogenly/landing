@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -322,8 +322,34 @@ function StepProgress({ current, total }: { current: number; total: number }) {
   );
 }
 
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isValidPhone(phone: string): boolean {
+  const digits = phone.replace(/\D/g, "");
+  return digits.length >= 7;
+}
+
 export default function BookACallPage() {
   const [step, setStep] = useState<Step>("intro");
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [contentHeight, setContentHeight] = useState<number | "auto">("auto");
+  const contentRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!innerRef.current) return;
+    const ro = new ResizeObserver(() => {
+      if (innerRef.current) {
+        setContentHeight(innerRef.current.scrollHeight);
+      }
+    });
+    ro.observe(innerRef.current);
+    // set initial height
+    setContentHeight(innerRef.current.scrollHeight);
+    return () => ro.disconnect();
+  }, [step]);
   const [data, setData] = useState<FormData>({
     firstName: "",
     email: "",
@@ -356,10 +382,33 @@ export default function BookACallPage() {
     anythingElse: "",
   });
 
-  const update = (field: keyof FormData, value: string) =>
+  const update = (field: keyof FormData, value: string) => {
     setData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
 
-  const next = () => setStep(getNextStep(step, data));
+  const validate = (): boolean => {
+    if (step === "contact") {
+      const newErrors: Partial<Record<keyof FormData, string>> = {};
+      if (!data.firstName.trim()) newErrors.firstName = "Required";
+      if (!data.email.trim()) newErrors.email = "Required";
+      else if (!isValidEmail(data.email)) newErrors.email = "Enter a valid email";
+      if (!data.phone.trim()) newErrors.phone = "Required";
+      else if (!isValidPhone(data.phone)) newErrors.phone = "Enter a valid phone number";
+      if (!data.contactMethod) newErrors.contactMethod = "Pick one";
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return false;
+      }
+    }
+    setErrors({});
+    return true;
+  };
+
+  const next = () => {
+    if (!validate()) return;
+    setStep(getNextStep(step, data));
+  };
   const prev = () => {
     const p = getPrevStep(step, data);
     if (p) setStep(p);
@@ -375,9 +424,9 @@ export default function BookACallPage() {
         return true;
       case "contact":
         return !!(
-          data.firstName &&
-          data.email &&
-          data.phone &&
+          data.firstName.trim() &&
+          isValidEmail(data.email) &&
+          isValidPhone(data.phone) &&
           data.contactMethod
         );
       case "how-found":
@@ -435,15 +484,22 @@ export default function BookACallPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="flex items-center justify-between px-6 py-5">
-        <Link href="/">
+      <header className="flex items-center gap-4 px-6 py-5">
+        <Link href="/" className="shrink-0">
           <Logo />
         </Link>
+        <div className="flex-1" />
+        {step !== "intro" && step !== "done" && (
+          <div className="w-48 sm:w-72 md:w-96">
+            <StepProgress current={currentStepIndex} total={totalSteps} />
+          </div>
+        )}
+        <div className="flex-1" />
         <Link
           href="/"
-          className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="group/link flex shrink-0 items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ArrowUpLeft className="h-4 w-4" />
+          <ArrowUpLeft className="h-4 w-4 transition-transform group-hover/link:-translate-x-0.5 group-hover/link:-translate-y-0.5" />
           Back to site
         </Link>
       </header>
@@ -471,31 +527,32 @@ export default function BookACallPage() {
             </div>
           ) : (
             <div className="flex flex-col gap-6">
-              {step !== "intro" && (
-                <StepProgress current={currentStepIndex} total={totalSteps} />
-              )}
-
-              <div>
+              <div
+                ref={contentRef}
+                className="transition-[height] duration-300 ease-in-out"
+                style={{ height: contentHeight, overflow: "hidden" }}
+              >
+              <div ref={innerRef}>
+              <div key={step}>
                 {step === "intro" && (
-                  <div className="space-y-5">
-                    <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                      Apply to Work With Us
-                    </h2>
-                    <div className="space-y-3 text-[15px] leading-relaxed text-muted-foreground">
-                      <p>
-                        We take on a limited number of clients at a time so we
-                        can give each project the attention it deserves. This
-                        application helps us understand your business and
-                        whether we're the right fit.
-                      </p>
-                      <p>
-                        Please answer thoughtfully. The more detail you give
-                        us, the better prepared we'll be if we move forward
-                        together.
-                      </p>
+                  <div className="space-y-6 text-center">
+                    <div className="space-y-4">
+                      <div className="inline-flex items-center rounded-full border border-border bg-background px-4 py-1.5 shadow-sm">
+                        <span className="text-sm font-medium text-muted-foreground">
+                          Limited availability
+                        </span>
+                      </div>
+                      <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                        Apply to Work With Us
+                      </h2>
                     </div>
-                    <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground">
-                      This takes about 5-10 minutes. We read every application.
+                    <p className="mx-auto max-w-md text-[15px] leading-relaxed text-muted-foreground">
+                      We take on a limited number of clients so every project
+                      gets the attention it deserves. This application helps us
+                      understand your business and whether we're the right fit.
+                    </p>
+                    <div className="mx-auto max-w-sm rounded-lg bg-muted/60 px-5 py-3.5 text-sm text-muted-foreground">
+                      Takes about 5-10 minutes. We read every one.
                     </div>
                   </div>
                 )}
@@ -512,44 +569,62 @@ export default function BookACallPage() {
                     </div>
                     <div>
                       <label className="mb-1.5 block text-sm font-medium">
-                        First name *
+                        First name
                       </label>
                       <input
                         type="text"
                         value={data.firstName}
                         onChange={(e) => update("firstName", e.target.value)}
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                        className={cn(
+                          "w-full rounded-lg border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary",
+                          errors.firstName ? "border-red-400" : "border-border"
+                        )}
                         placeholder="Alex"
                         autoFocus
                       />
+                      {errors.firstName && (
+                        <p className="mt-1 text-xs text-red-500">{errors.firstName}</p>
+                      )}
                     </div>
                     <div>
                       <label className="mb-1.5 block text-sm font-medium">
-                        Email address *
+                        Email address
                       </label>
                       <input
                         type="email"
                         value={data.email}
                         onChange={(e) => update("email", e.target.value)}
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                        className={cn(
+                          "w-full rounded-lg border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary",
+                          errors.email ? "border-red-400" : "border-border"
+                        )}
                         placeholder="alex@company.com"
                       />
+                      {errors.email && (
+                        <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+                      )}
                     </div>
                     <div>
                       <label className="mb-1.5 block text-sm font-medium">
-                        Phone number *
+                        Phone number
                       </label>
                       <input
                         type="tel"
                         value={data.phone}
                         onChange={(e) => update("phone", e.target.value)}
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                        className={cn(
+                          "w-full rounded-lg border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary",
+                          errors.phone ? "border-red-400" : "border-border"
+                        )}
                         placeholder="+1 (555) 000-0000"
                       />
+                      {errors.phone && (
+                        <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
+                      )}
                     </div>
                     <div>
                       <label className="mb-1.5 block text-sm font-medium">
-                        How should we reach you? *
+                        How should we reach you?
                       </label>
                       <div className="flex gap-2">
                         <button
@@ -655,7 +730,7 @@ export default function BookACallPage() {
                     </h2>
                     <div>
                       <label className="mb-1.5 block text-sm font-medium">
-                        Business name *
+                        Business name
                       </label>
                       <input
                         type="text"
@@ -1033,6 +1108,8 @@ export default function BookACallPage() {
                   </div>
                 )}
               </div>
+              </div>
+              </div>
 
               <div className="flex items-center justify-between">
                 {step === "intro" ? (
@@ -1041,10 +1118,10 @@ export default function BookACallPage() {
                   <Button
                     variant="ghost"
                     onClick={prev}
-                    disabled={step === "contact"}
+                    disabled={false}
                     className="gap-1.5 px-5 py-2.5 text-sm"
                   >
-                    <ArrowLeft className="h-4 w-4" />
+                    <ArrowLeft className="h-4 w-4 transition-transform group-hover/button:-translate-x-0.5" />
                     Back
                   </Button>
                 )}
@@ -1059,7 +1136,7 @@ export default function BookACallPage() {
                     : step === "anything-else"
                       ? "Submit"
                       : "Next"}
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover/button:translate-x-0.5" />
                 </Button>
               </div>
             </div>

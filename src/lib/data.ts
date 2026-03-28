@@ -104,12 +104,4 @@ export const footerLinks = {
     { label: "How It Works", href: "#how-it-works" },
     { label: "FAQ", href: "#faq" },
   ],
-  company: [
-    { label: "About", href: "#" },
-    { label: "Contact", href: "mailto:alex@cogenly.com" },
-  ],
-  legal: [
-    { label: "Privacy", href: "#" },
-    { label: "Terms", href: "#" },
-  ],
 };

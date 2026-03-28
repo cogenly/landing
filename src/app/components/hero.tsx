@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { DotPattern } from "@/components/ui/dot-pattern";
@@ -38,10 +39,11 @@ export function Hero() {
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/book-a-call">
               <ShimmerButton
-                className="h-12 px-8 text-base font-medium"
+                className="group/cta h-12 px-8 text-base font-medium"
                 background="oklch(0.62 0.18 250)"
               >
                 Book a Call
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/cta:translate-x-0.5" />
               </ShimmerButton>
             </Link>
             <Button

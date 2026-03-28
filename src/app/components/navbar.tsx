@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Menu } from "lucide-react";
+import { ArrowRight, Menu } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -109,10 +109,11 @@ export function Navbar() {
             )}
           >
             <ShimmerButton
-              className="h-9 px-5 py-1.5 text-sm font-semibold"
+              className="group/cta h-9 px-5 py-1.5 text-sm font-semibold"
               background="oklch(0.62 0.18 250)"
             >
               Get Started
+              <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover/cta:translate-x-0.5" />
             </ShimmerButton>
           </Link>
 
@@ -154,10 +155,11 @@ export function Navbar() {
                   <BlurFade delay={0.25} inView>
                     <Link href="/book-a-call" onClick={() => setOpen(false)}>
                       <ShimmerButton
-                        className="h-12 w-full text-base font-semibold"
+                        className="group/cta h-12 w-full text-base font-semibold"
                         background="oklch(0.62 0.18 250)"
                       >
                         Get Started
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/cta:translate-x-0.5" />
                       </ShimmerButton>
                     </Link>
                   </BlurFade>
