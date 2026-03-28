@@ -8,7 +8,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Check,
-  MessageCircle,
   ArrowUpLeft,
 } from "lucide-react";
 import { Logo } from "../components/logo";
@@ -39,7 +38,6 @@ type Step =
   | "commitment"
   | "concerns"
   | "revenue"
-  | "availability"
   | "anything-else"
   | "done";
 
@@ -201,7 +199,6 @@ const FLOW: Step[] = [
   "commitment",
   "concerns",
   "revenue",
-  "availability",
   "anything-else",
   "done",
 ];
@@ -234,7 +231,6 @@ interface FormData {
   commitment: string;
   concerns: string;
   revenue: string;
-  availability: string;
   anythingElse: string;
 }
 
@@ -386,7 +382,6 @@ export default function BookACallPage() {
     commitment: "",
     concerns: "",
     revenue: "",
-    availability: "",
     anythingElse: "",
   });
 
@@ -481,8 +476,6 @@ export default function BookACallPage() {
         return !!data.concerns.trim();
       case "revenue":
         return !!data.revenue;
-      case "availability":
-        return !!data.availability.trim();
       case "anything-else":
         return true; // optional
       default:
@@ -498,7 +491,7 @@ export default function BookACallPage() {
         </Link>
         <div className="flex-1" />
         {step !== "intro" && step !== "done" && (
-          <div className="w-48 sm:w-72 md:w-96">
+          <div className="w-36 sm:w-72 md:w-96">
             <StepProgress current={currentStepIndex} total={totalSteps} />
           </div>
         )}
@@ -508,7 +501,7 @@ export default function BookACallPage() {
           className="group/link flex shrink-0 items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowUpLeft className="h-4 w-4 transition-transform group-hover/link:-translate-x-0.5 group-hover/link:-translate-y-0.5" />
-          Back to site
+          <span className="hidden sm:inline">Back to site</span>
         </Link>
       </header>
 
@@ -516,11 +509,13 @@ export default function BookACallPage() {
         <div className="w-full max-w-lg">
           {step === "done" ? (
             <div className="py-12 text-center">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                <MessageCircle className="h-8 w-8 text-primary" />
-              </div>
-              <h2 className="text-2xl font-bold">Application received.</h2>
-              <p className="mt-3 text-muted-foreground">
+              <p className="mb-3 text-sm font-medium uppercase tracking-widest text-primary">
+                All done
+              </p>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                Application received.
+              </h2>
+              <p className="mx-auto mt-4 max-w-sm text-[15px] leading-relaxed text-muted-foreground">
                 Our team will review this and reach out via{" "}
                 {data.contactMethod === "whatsapp"
                   ? "WhatsApp"
@@ -905,7 +900,9 @@ export default function BookACallPage() {
                 {step === "hours-wasted" && (
                   <div className="space-y-3">
                     <h2 className="mb-4 text-xl font-bold">
-                      How many hours per week does your team spend on this?
+                      {data.teamSize === "solo"
+                        ? "How many hours per week do you spend on this?"
+                        : "How many hours per week does your team spend on this?"}
                     </h2>
                     {HOURS_WASTED.map((option, i) => (
                       <ChoiceButton
@@ -1074,26 +1071,6 @@ export default function BookACallPage() {
                   </div>
                 )}
 
-                {step === "availability" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      When are you available for a 30-minute discovery call?
-                    </h2>
-                    <p className="text-sm text-muted-foreground">
-                      Give us a few days and times that work for you. We'll
-                      confirm one.
-                    </p>
-                    <textarea
-                      value={data.availability}
-                      onChange={(e) =>
-                        update("availability", e.target.value)
-                      }
-                      className="min-h-[100px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="e.g. Tuesday or Thursday afternoon, anytime after 2pm EST"
-                      autoFocus={isDesktop}
-                    />
-                  </div>
-                )}
 
                 {step === "anything-else" && (
                   <div className="space-y-4">

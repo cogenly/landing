@@ -11,7 +11,7 @@ import { faqs } from "@/lib/data";
 
 export function FAQ() {
   return (
-    <section id="faq" className="bg-secondary/50 py-20 sm:py-24 lg:py-32">
+    <section id="faq" className="bg-secondary/50 py-16 sm:py-24 lg:py-32">
       <div className="mx-auto max-w-3xl px-6 sm:px-8 lg:px-12">
         <BlurFade delay={0.1} inView>
           <div className="text-center">

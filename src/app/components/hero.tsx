@@ -19,7 +19,7 @@ export function Hero() {
 
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center sm:px-8">
         <BlurFade delay={0.1} inView>
-          <h1 className="text-5xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-7xl">
             Your team is doing work{" "}
             <span className="bg-gradient-to-r from-[oklch(0.55_0.2_250)] to-[oklch(0.65_0.22_270)] bg-clip-text text-transparent">
               a machine should do.

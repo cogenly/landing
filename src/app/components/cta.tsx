@@ -10,7 +10,7 @@ export function CTA() {
   return (
     <section
       id="contact"
-      className="relative overflow-hidden py-20 sm:py-24 lg:py-32"
+      className="relative overflow-hidden py-16 sm:py-24 lg:py-32"
     >
       <DotPattern
         className="[mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_65%)] opacity-30"
