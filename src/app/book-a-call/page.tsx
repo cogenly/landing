@@ -9,9 +9,11 @@ import {
   ArrowLeft,
   Check,
   ArrowUpLeft,
+  Loader2,
 } from "lucide-react";
 import { Logo } from "../components/logo";
 import Link from "next/link";
+import { submitIntake } from "./actions";
 
 type Step =
   | "intro"
@@ -332,6 +334,8 @@ function isValidPhone(phone: string): boolean {
 
 export default function BookACallPage() {
   const [step, setStep] = useState<Step>("intro");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [contentHeight, setContentHeight] = useState<number | "auto">("auto");
   const contentRef = useRef<HTMLDivElement>(null);
@@ -403,9 +407,20 @@ export default function BookACallPage() {
     return true;
   };
 
-  const next = () => {
+  const next = async () => {
     if (!validate()) return;
-    setStep(getNextStep(step, data));
+    const nextStep = getNextStep(step, data);
+    if (nextStep === "done") {
+      setSubmitting(true);
+      setSubmitError(null);
+      const result = await submitIntake(data);
+      setSubmitting(false);
+      if (result.error) {
+        setSubmitError(result.error);
+        return;
+      }
+    }
+    setStep(nextStep);
   };
   const prev = () => {
     const p = getPrevStep(step, data);
@@ -1096,6 +1111,12 @@ export default function BookACallPage() {
               </div>
               </div>
 
+              {submitError && (
+                <p className="mb-2 text-sm text-red-500">
+                  Something went wrong. Please try again.
+                </p>
+              )}
+
               <div className="flex items-center justify-between">
                 {step === "intro" ? (
                   <div />
@@ -1113,15 +1134,24 @@ export default function BookACallPage() {
 
                 <Button
                   onClick={next}
-                  disabled={!canGoNext()}
+                  disabled={!canGoNext() || submitting}
                   className="gap-1.5 px-6 py-2.5 text-sm"
                 >
-                  {step === "intro"
-                    ? "Start Application"
-                    : step === "anything-else"
-                      ? "Submit"
-                      : "Next"}
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover/button:translate-x-0.5" />
+                  {submitting ? (
+                    <>
+                      Submitting
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    </>
+                  ) : (
+                    <>
+                      {step === "intro"
+                        ? "Start Application"
+                        : step === "anything-else"
+                          ? "Submit"
+                          : "Next"}
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover/button:translate-x-0.5" />
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

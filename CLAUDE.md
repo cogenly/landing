@@ -7,7 +7,7 @@
 - **supabase** (green) - all database work, migrations, server actions, queries
 - **frontend** (blue) - Next.js pages, components, UI, forms
 - **git** (white) - commits, branches, PRs
-- **playwright** (cyan) - screenshots, visual verification
+- **playwright** (cyan) - screenshots, visual verification (only when explicitly asked)
 
 Everything Cogenly lives here. Marketing site, client operations, integrations, automations. Run `claude` from this directory to operate the business.
 
@@ -17,8 +17,8 @@ Everything Cogenly lives here. Marketing site, client operations, integrations, 
 
 | Layer | Tool | Purpose |
 |-------|------|---------|
-| Platform | Next.js (this repo) | Marketing site + future dashboard |
-| Data | Supabase | Clients, calls, diagnoses, projects |
+| Platform | Next.js (this repo) | Marketing site + admin dashboard |
+| Data | Supabase | Clients, calls, projects, intake submissions |
 | Code | GitHub (`cogenly` org) | This repo + per-client repos |
 | Domain | Namecheap | cogenly.com |
 | Banking | Mercury | Business account + invoicing |
@@ -31,14 +31,20 @@ Everything Cogenly lives here. Marketing site, client operations, integrations, 
 ```
 platform/
   CLAUDE.md
+  proxy.ts                 # Next.js 16 proxy (auth route protection)
   src/                     # Next.js app
     app/
+      (auth)/              # login/signup pages (admin-only, no public signup)
+      (dashboard)/         # admin dashboard (sidebar layout, protected)
+      auth/callback/       # Supabase auth callback handler
       components/          # page sections (navbar, hero, services, etc.)
       fonts/               # Open Sauce Sans (local)
       page.tsx             # main landing page
     components/ui/         # shadcn + magic-ui primitives
     lib/
+      auth/actions.ts      # server actions: login, signup, logout
       data.ts              # all marketing copy
+      supabase/            # Supabase clients (browser + server)
   supabase/
     migrations/            # SQL schema migrations
   clients/                 # per-client docs
@@ -54,9 +60,11 @@ platform/
 
 ### Supabase Schema
 
-Tables: `clients`, `calls`, `diagnoses`, `projects`, `decisions`, `patterns`
+Tables: `clients`, `intake_submissions`, `calls`, `projects`, `decisions`, `profiles`
 
-See `supabase/migrations/001_initial_schema.sql` for full schema.
+See `supabase/migrations/` for full schema. Key migrations:
+- `001_initial_schema.sql` - core business tables
+- `002_profiles.sql` - user profiles linked to Supabase Auth, auto-created on signup
 
 ### What Lives Where
 
@@ -65,9 +73,8 @@ See `supabase/migrations/001_initial_schema.sql` for full schema.
 | Client info, status, pipeline | Supabase | Queryable, intake form writes here |
 | Call transcripts (full text) | Git `clients/<name>/transcripts/` | Long docs, Claude reads directly |
 | Call metadata (date, outcome) | Supabase `calls` table | Queryable |
-| Diagnosis responses | Supabase `diagnoses` table | Structured, cross-client queries |
+| Intake form submissions | Supabase `intake_submissions` table | Full form responses in JSONB |
 | Architecture decisions | Git `clients/<name>/architecture/` + Supabase | Detail in git, metadata in db |
-| Patterns | Git `patterns/` + Supabase | Detail in git, queryable in db |
 | Project status | Supabase `projects` table | Pipeline tracking |
 | Offers, sales framework | Notion | Low volume, already exists |
 | Marketing copy | `src/lib/data.ts` | Edit copy here, not in components |
@@ -116,10 +123,19 @@ See `supabase/migrations/001_initial_schema.sql` for full schema.
    > Patterns extracted to patterns/
 ```
 
+## Auth
+
+- Supabase Auth (email/password)
+- Admin-only login. No public signup. Create admin users via Supabase dashboard.
+- `profiles` table auto-created on signup with `role: 'client'` default. Set to `'admin'` manually.
+- `proxy.ts` protects `/dashboard/*` routes, redirects to `/login`
+- Logged-in users on `/login` get redirected to `/dashboard`
+
 ## Tech Stack (Site)
 
 - Next.js 16 (App Router) / React 19 / TypeScript
 - Tailwind CSS v4 / shadcn/ui v4 / MagicUI
+- Supabase (Auth + Postgres)
 - Font: Open Sauce Sans (local, `src/app/fonts/`) + Geist Mono (Google)
 - Package manager: **bun** (never npm)
 - Primary color: blue (`oklch(0.55 0.2 250)`)

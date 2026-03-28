@@ -7,19 +7,29 @@ create table clients (
   email text,
   phone text,
   company text,
+  website text,
   industry text,
-  team_size int,
-  monthly_revenue text,
+  team_size text,
+  revenue text,
   status text not null default 'lead'
     check (status in ('lead', 'call_scheduled', 'proposal', 'client', 'completed', 'lost')),
-  source text
-    check (source in ('linkedin', 'website', 'referral', 'skool')),
+  source text,
   preferred_contact text
     check (preferred_contact in ('imessage', 'whatsapp', 'email')),
   notes text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+-- Intake submissions (book-a-call form)
+create table intake_submissions (
+  id uuid primary key default gen_random_uuid(),
+  client_id uuid not null references clients(id) on delete cascade,
+  responses jsonb not null default '{}',
+  created_at timestamptz default now()
+);
+
+create index intake_submissions_client_id_idx on intake_submissions(client_id);
 
 -- Calls (discovery, followup, check-in)
 create table calls (
@@ -29,24 +39,9 @@ create table calls (
   call_type text not null
     check (call_type in ('discovery', 'followup', 'checkin')),
   duration_min int,
-  transcript_path text,  -- path to transcript file in git (clients/<name>/transcripts/...)
+  transcript_path text,
   notes text,
   outcome text,
-  created_at timestamptz default now()
-);
-
--- Diagnoses (client system audit)
-create table diagnoses (
-  id uuid primary key default gen_random_uuid(),
-  client_id uuid references clients(id) on delete cascade,
-  current_tools text[],
-  current_process text,
-  hours_spent_weekly numeric,
-  labor_cost_monthly numeric,
-  pain_points text,
-  desired_outcome text,
-  systems_used text[],
-  additional_notes text,
   created_at timestamptz default now()
 );
 
@@ -68,7 +63,7 @@ create table projects (
   updated_at timestamptz default now()
 );
 
--- Decisions (architecture decisions, training data for future AI)
+-- Decisions (architecture decisions per project)
 create table decisions (
   id uuid primary key default gen_random_uuid(),
   project_id uuid references projects(id) on delete cascade,
@@ -76,17 +71,6 @@ create table decisions (
   reasoning text,
   alternatives_considered text,
   outcome text,
-  created_at timestamptz default now()
-);
-
--- Patterns (repeating solutions across clients/verticals)
-create table patterns (
-  id uuid primary key default gen_random_uuid(),
-  vertical text,
-  problem text not null,
-  solution text,
-  frequency int default 1,
-  linked_project_ids uuid[],
   created_at timestamptz default now()
 );
 
@@ -107,18 +91,15 @@ create trigger projects_updated_at
   before update on projects
   for each row execute function update_updated_at();
 
--- RLS policies (enable row level security)
+-- RLS policies
 alter table clients enable row level security;
+alter table intake_submissions enable row level security;
 alter table calls enable row level security;
-alter table diagnoses enable row level security;
 alter table projects enable row level security;
 alter table decisions enable row level security;
-alter table patterns enable row level security;
 
--- Allow authenticated access (you + your site's service role)
 create policy "Full access" on clients for all using (true);
+create policy "Full access" on intake_submissions for all using (true);
 create policy "Full access" on calls for all using (true);
-create policy "Full access" on diagnoses for all using (true);
 create policy "Full access" on projects for all using (true);
 create policy "Full access" on decisions for all using (true);
-create policy "Full access" on patterns for all using (true);

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import NextTopLoader from "nextjs-toploader";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const openSauceSans = localFont({
@@ -41,7 +42,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <NextTopLoader color="oklch(0.62 0.18 250)" showSpinner={false} />
-        {children}
+        <TooltipProvider>
+          {children}
+        </TooltipProvider>
       </body>
     </html>
   );
