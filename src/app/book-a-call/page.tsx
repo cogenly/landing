@@ -485,7 +485,7 @@ export default function BookACallPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="flex items-center gap-4 px-6 py-5">
+      <header className="sticky top-0 z-50 flex items-center gap-4 bg-background/80 px-6 py-4 backdrop-blur-lg">
         <Link href="/" className="shrink-0">
           <Logo />
         </Link>
