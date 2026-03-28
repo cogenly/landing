@@ -60,7 +60,7 @@ platform/
 
 ### Supabase Schema
 
-Tables: `clients`, `intake_submissions`, `calls`, `projects`, `decisions`, `profiles`
+Tables: `clients`, `calls`, `projects`, `decisions`, `profiles`
 
 See `supabase/migrations/` for full schema. Key migrations:
 - `001_initial_schema.sql` - core business tables
@@ -73,7 +73,6 @@ See `supabase/migrations/` for full schema. Key migrations:
 | Client info, status, pipeline | Supabase | Queryable, intake form writes here |
 | Call transcripts (full text) | Git `clients/<name>/transcripts/` | Long docs, Claude reads directly |
 | Call metadata (date, outcome) | Supabase `calls` table | Queryable |
-| Intake form submissions | Supabase `intake_submissions` table | Full form responses in JSONB |
 | Architecture decisions | Git `clients/<name>/architecture/` + Supabase | Detail in git, metadata in db |
 | Project status | Supabase `projects` table | Pipeline tracking |
 | Offers, sales framework | Notion | Low volume, already exists |

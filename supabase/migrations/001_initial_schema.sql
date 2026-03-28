@@ -21,16 +21,6 @@ create table clients (
   updated_at timestamptz default now()
 );
 
--- Intake submissions (book-a-call form)
-create table intake_submissions (
-  id uuid primary key default gen_random_uuid(),
-  client_id uuid not null references clients(id) on delete cascade,
-  responses jsonb not null default '{}',
-  created_at timestamptz default now()
-);
-
-create index intake_submissions_client_id_idx on intake_submissions(client_id);
-
 -- Calls (discovery, followup, check-in)
 create table calls (
   id uuid primary key default gen_random_uuid(),
@@ -91,15 +81,13 @@ create trigger projects_updated_at
   before update on projects
   for each row execute function update_updated_at();
 
--- RLS policies
+-- RLS policies (authenticated users only)
 alter table clients enable row level security;
-alter table intake_submissions enable row level security;
 alter table calls enable row level security;
 alter table projects enable row level security;
 alter table decisions enable row level security;
 
-create policy "Full access" on clients for all using (true);
-create policy "Full access" on intake_submissions for all using (true);
-create policy "Full access" on calls for all using (true);
-create policy "Full access" on projects for all using (true);
-create policy "Full access" on decisions for all using (true);
+create policy "Authenticated access" on clients for all to authenticated using (true) with check (true);
+create policy "Authenticated access" on calls for all to authenticated using (true) with check (true);
+create policy "Authenticated access" on projects for all to authenticated using (true) with check (true);
+create policy "Authenticated access" on decisions for all to authenticated using (true) with check (true);

@@ -10,6 +10,11 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email?.endsWith("@cogenly.com")) {
+        await supabase.auth.signOut();
+        return NextResponse.redirect(`${origin}/login?error=unauthorized_domain`);
+      }
       return NextResponse.redirect(`${origin}${next}`);
     }
   }

@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { Logo } from "@/app/components/logo";
 import { LoginForm } from "@/components/login-form";
+
+export const metadata: Metadata = {
+  title: "Login",
+  robots: { index: false, follow: false },
+};
 
 export default function LoginPage() {
   return (
@@ -9,7 +16,9 @@ export default function LoginPage() {
         <Logo size="lg" />
       </Link>
       <div className="w-full max-w-sm">
-        <LoginForm />
+        <Suspense>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );

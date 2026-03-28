@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import {
   Card,
@@ -7,6 +8,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Users, FolderOpen, Phone, TrendingUp } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  robots: { index: false, follow: false },
+};
 
 export default async function DashboardPage() {
   const supabase = await createClient();

@@ -36,7 +36,7 @@ interface IntakeFormData {
 export async function submitIntake(formData: IntakeFormData) {
   const supabase = await createClient();
 
-  const { data: client, error: clientError } = await supabase
+  const { data: client, error } = await supabase
     .from("clients")
     .insert({
       name: formData.firstName,
@@ -57,19 +57,8 @@ export async function submitIntake(formData: IntakeFormData) {
     .select("id")
     .single();
 
-  if (clientError) {
-    return { error: clientError.message };
-  }
-
-  const { error: intakeError } = await supabase
-    .from("intake_submissions")
-    .insert({
-      client_id: client.id,
-      responses: formData,
-    });
-
-  if (intakeError) {
-    return { error: intakeError.message };
+  if (error) {
+    return { error: error.message };
   }
 
   return { success: true, clientId: client.id };
