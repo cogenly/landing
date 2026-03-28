@@ -1,0 +1,54 @@
+"use client";
+
+import { BlurFade } from "@/components/ui/blur-fade";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { DotPattern } from "@/components/ui/dot-pattern";
+import { IntakeForm } from "./intake-form";
+
+export function CTA() {
+  return (
+    <section
+      id="contact"
+      className="relative overflow-hidden py-20 sm:py-24 lg:py-32"
+    >
+      <DotPattern
+        className="[mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_65%)] opacity-30"
+        width={20}
+        height={20}
+        cr={1}
+      />
+
+      <div className="relative z-10 mx-auto max-w-3xl px-6 text-center sm:px-8">
+        <BlurFade delay={0.1} inView>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+            Ready to{" "}
+            <span className="text-primary">Build?</span>
+          </h2>
+        </BlurFade>
+
+        <BlurFade delay={0.2} inView>
+          <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
+            Tell us what you need automated. We will scope it, price it,
+            and give you an honest recommendation.
+          </p>
+        </BlurFade>
+
+        <BlurFade delay={0.3} inView>
+          <div className="mt-8">
+            <IntakeForm>
+              <ShimmerButton
+                className="mx-auto h-12 px-8 text-base font-medium"
+                background="oklch(0.62 0.18 250)"
+              >
+                Book a Call
+              </ShimmerButton>
+            </IntakeForm>
+            <p className="mt-4 text-sm text-muted-foreground">
+              We respond within 24 hours.
+            </p>
+          </div>
+        </BlurFade>
+      </div>
+    </section>
+  );
+}
