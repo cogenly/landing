@@ -172,13 +172,7 @@
   }
 }
 
-/* Collapsed sidebar: center icons, hide text */
-[data-collapsible="icon"] [data-sidebar="menu"] {
-  align-items: center;
-}
-[data-collapsible="icon"] [data-sidebar="menu-button"] {
-  justify-content: center;
-}
+/* Collapsed sidebar: hide text */
 [data-collapsible="icon"] [data-sidebar="menu-button"] > span:not([data-logo-text]) {
   display: none;
 }
