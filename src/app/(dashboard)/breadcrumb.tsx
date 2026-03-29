@@ -10,17 +10,22 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useBreadcrumbLabels } from "./breadcrumb-context";
 
 const labels: Record<string, string> = {
   dashboard: "Dashboard",
   clients: "Clients",
-  projects: "Projects",
   calls: "Calls",
   settings: "Settings",
 };
 
+function isUUID(s: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+}
+
 export function DashboardBreadcrumb() {
   const pathname = usePathname();
+  const { labels: dynamicLabels } = useBreadcrumbLabels();
   const segments = pathname.split("/").filter(Boolean);
 
   if (segments.length <= 1) {
@@ -37,7 +42,8 @@ export function DashboardBreadcrumb() {
     );
   }
 
-  const currentSegment = segments[segments.length - 1];
+  // Build crumbs from segments: ["dashboard", "clients", "uuid"]
+  const crumbs = segments.slice(1); // skip "dashboard"
 
   return (
     <Breadcrumb>
@@ -50,12 +56,38 @@ export function DashboardBreadcrumb() {
             Dashboard
           </BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbSeparator className="hidden md:block text-muted-foreground/40" />
-        <BreadcrumbItem>
-          <BreadcrumbPage className="font-semibold tracking-tight">
-            {labels[currentSegment] ?? currentSegment}
-          </BreadcrumbPage>
-        </BreadcrumbItem>
+
+        {crumbs.map((segment, i) => {
+          const isLast = i === crumbs.length - 1;
+          const href = "/dashboard/" + crumbs.slice(0, i + 1).join("/");
+
+          // Resolve label: static map → dynamic context → fallback
+          let label = labels[segment] ?? dynamicLabels[segment];
+          if (!label && isUUID(segment)) {
+            label = dynamicLabels[segment] ?? "...";
+          }
+          label = label ?? segment;
+
+          return (
+            <span key={segment} className="contents">
+              <BreadcrumbSeparator className="hidden md:block text-muted-foreground/40" />
+              <BreadcrumbItem>
+                {isLast ? (
+                  <BreadcrumbPage className="font-semibold tracking-tight">
+                    {label}
+                  </BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink
+                    render={<Link href={href} />}
+                    className="text-muted-foreground/70"
+                  >
+                    {label}
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+            </span>
+          );
+        })}
       </BreadcrumbList>
     </Breadcrumb>
   );

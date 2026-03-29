@@ -1,76 +1,63 @@
-import { Badge } from "@/components/ui/badge";
+import type { LucideIcon } from "lucide-react";
+import {
+  CircleDot,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  UserCheck,
+  UserX,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const clientStatusColors: Record<string, string> = {
-  partial: "bg-orange-100 text-orange-700",
-  lead: "bg-blue-100 text-blue-700",
-  call_scheduled: "bg-yellow-100 text-yellow-700",
-  proposal: "bg-purple-100 text-purple-700",
-  client: "bg-green-100 text-green-700",
-  completed: "bg-gray-100 text-gray-700",
-  lost: "bg-red-100 text-red-700",
+type StatusConfig = {
+  icon: LucideIcon;
+  iconClassName: string;
+  label: string;
 };
 
-const clientStatusLabels: Record<string, string> = {
-  partial: "Partial",
-  lead: "Lead",
-  call_scheduled: "Call Scheduled",
-  proposal: "Proposal",
-  client: "Client",
-  completed: "Completed",
-  lost: "Lost",
+const CLIENT_STATUS_CONFIG: Record<string, StatusConfig> = {
+  partial: { icon: Clock, iconClassName: "text-amber-500", label: "Partial" },
+  lead: { icon: CircleDot, iconClassName: "text-blue-500", label: "Lead" },
+  client: {
+    icon: CheckCircle2,
+    iconClassName: "text-emerald-500",
+    label: "Client",
+  },
+  churned: {
+    icon: UserX,
+    iconClassName: "text-muted-foreground",
+    label: "Churned",
+  },
 };
 
-const projectStatusColors: Record<string, string> = {
-  scoping: "bg-blue-100 text-blue-700",
-  building: "bg-yellow-100 text-yellow-700",
-  delivered: "bg-green-100 text-green-700",
-  retainer: "bg-purple-100 text-purple-700",
-};
-
-const projectStatusLabels: Record<string, string> = {
-  scoping: "Scoping",
-  building: "Building",
-  delivered: "Delivered",
-  retainer: "Retainer",
-};
-
-const callTypeColors: Record<string, string> = {
-  discovery: "bg-blue-100 text-blue-700",
-  followup: "bg-yellow-100 text-yellow-700",
-  checkin: "bg-green-100 text-green-700",
-};
-
-const callTypeLabels: Record<string, string> = {
-  discovery: "Discovery",
-  followup: "Follow-up",
-  checkin: "Check-in",
-};
-
-const colorsByType = {
-  client: clientStatusColors,
-  project: projectStatusColors,
-  call: callTypeColors,
-} as const;
-
-const labelsByType = {
-  client: clientStatusLabels,
-  project: projectStatusLabels,
-  call: callTypeLabels,
-} as const;
+function getStatusConfig(
+  configMap: Record<string, StatusConfig>,
+  status: string,
+): StatusConfig {
+  return (
+    configMap[status] ?? {
+      icon: CircleDot,
+      iconClassName: "text-muted-foreground",
+      label: status,
+    }
+  );
+}
 
 export function StatusBadge({
   type,
   status,
 }: {
-  type: "client" | "project" | "call";
+  type: "client";
   status: string;
 }) {
-  const colors = colorsByType[type];
-  const labels = labelsByType[type];
+  const configMap = type === "client" ? CLIENT_STATUS_CONFIG : CLIENT_STATUS_CONFIG;
+  const config = getStatusConfig(configMap, status);
+  const Icon = config.icon;
 
   return (
-    <Badge variant="secondary" className={colors[status] ?? ""}>
-      {labels[status] ?? status}
-    </Badge>
+    <span className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium">
+      <Icon className={cn("size-3", config.iconClassName)} />
+      {config.label}
+    </span>
   );
 }

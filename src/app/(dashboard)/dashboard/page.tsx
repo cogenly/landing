@@ -6,12 +6,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Users, Phone } from "lucide-react";
+import { Users, Phone, DollarSign, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { BlurFade } from "@/components/ui/blur-fade";
+
 import { PageHeader } from "@/components/dashboard/page-header";
 import { StatusBadge } from "@/components/dashboard/status-badge";
-import { StatCard } from "@/components/dashboard/stat-card";
+import { Stat, StatGroup } from "@/components/dashboard/stat-card";
 import { formatDate, formatDateTime } from "@/lib/format";
 import type { UpcomingCall } from "@/lib/types";
 
@@ -28,6 +28,7 @@ export default async function DashboardPage() {
 
   const [
     { count: clientCount },
+    { count: leadCount },
     { count: callCount },
     { data: recentLeads },
     { data: rawUpcomingCalls },
@@ -36,6 +37,10 @@ export default async function DashboardPage() {
       .from("clients")
       .select("*", { count: "exact", head: true })
       .eq("status", "client"),
+    supabase
+      .from("clients")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "lead"),
     supabase
       .from("calls")
       .select("*", { count: "exact", head: true })
@@ -58,8 +63,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-5">
-      <BlurFade delay={0.05}>
-        <PageHeader
+      <PageHeader
           title="Dashboard"
           description={
             <>
@@ -71,27 +75,19 @@ export default async function DashboardPage() {
             </>
           }
         />
-      </BlurFade>
 
-      <BlurFade delay={0.1}>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <StatCard
-            title="Clients"
-            value={String(clientCount ?? 0)}
-            description="Active clients"
-            icon={Users}
-          />
-          <StatCard
-            title="Calls"
-            value={String(callCount ?? 0)}
-            description="This month"
-            icon={Phone}
-          />
-        </div>
-      </BlurFade>
+      <StatGroup columns={4}>
+        <Stat icon={Users} label="Active Clients" value={clientCount ?? 0} />
+        <Stat icon={TrendingUp} label="Open Leads" value={leadCount ?? 0} />
+        <Stat icon={Phone} label="Calls This Month" value={callCount ?? 0} />
+        <Stat
+          icon={DollarSign}
+          label="Pipeline"
+          value={`${(clientCount ?? 0) + (leadCount ?? 0)}`}
+        />
+      </StatGroup>
 
-      <BlurFade delay={0.15}>
-        <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
           <Card>
             <CardHeader>
               <CardTitle>Recent Leads</CardTitle>
@@ -185,7 +181,6 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </div>
-      </BlurFade>
     </div>
   );
 }

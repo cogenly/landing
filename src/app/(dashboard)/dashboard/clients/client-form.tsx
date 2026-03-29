@@ -245,11 +245,8 @@ function ClientForm({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="lead">Lead</SelectItem>
-                  <SelectItem value="call_scheduled">Call Scheduled</SelectItem>
-                  <SelectItem value="proposal">Proposal</SelectItem>
                   <SelectItem value="client">Client</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="lost">Lost</SelectItem>
+                  <SelectItem value="churned">Churned</SelectItem>
                 </SelectContent>
               </Select>
             </div>

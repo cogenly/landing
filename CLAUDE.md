@@ -69,6 +69,10 @@ See `supabase/migrations/` for full schema. Key migrations:
 - `001_initial_schema.sql` - core business tables
 - `002_profiles.sql` - user profiles linked to Supabase Auth, auto-created on signup
 - `003_remove_projects_transcripts.sql` - removed projects, decisions tables and transcript_path from calls
+- `005_partial_intake.sql` - added 'partial' status for form tracking
+- `006_simplify_statuses.sql` - simplified to: partial, lead, client, churned
+
+Client statuses: `partial` (started form), `lead` (completed form), `client` (active), `churned` (former client)
 
 ### What Lives Where
 
@@ -90,32 +94,26 @@ See `supabase/migrations/` for full schema. Key migrations:
 
 ```
 1. INTAKE
-   Prospect fills form on cogenly.com
-   > Writes to Supabase clients table (status: lead)
-   > Notification sent
+   Prospect fills form on cogenly.com/book-a-call
+   > Contact step creates partial record (status: partial)
+   > Full submission promotes to (status: lead) with lead score
 
 2. DISCOVERY CALL
    > Log metadata to Supabase calls table
-   > Update client status: call_scheduled
 
-3. DIAGNOSIS
-   Client fills diagnosis form
-   > Writes to Supabase diagnoses table
-   > Claude reads diagnosis + transcript, generates proposal
-   > Update client status: proposal
-
-4. CLOSE & ONBOARD
+3. CLOSE & ONBOARD
    > Create client dir in clients/
    > Create cogenly/client-<name> repo from template
    > Update Supabase status: client
    > Send Mercury invoice (setup fee)
 
-5. BUILD & DELIVER
+4. BUILD & DELIVER
    > Work in cogenly/client-<name> repo
 
-6. RETAIN
+5. RETAIN
    > Monthly Mercury invoice (retainer)
    > Check-in calls logged
+   > If client leaves: update status to churned
 ```
 
 ## Auth

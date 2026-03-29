@@ -6,6 +6,8 @@ import {
 } from "@/components/ui/sidebar";
 import { createClient } from "@/lib/supabase/server";
 import { AppSidebar } from "./app-sidebar";
+import { PageTransition } from "./page-transition";
+import { BreadcrumbProvider } from "./breadcrumb-context";
 import { DashboardBreadcrumb } from "./breadcrumb";
 import {
   HeaderActionsProvider,
@@ -26,6 +28,7 @@ export default async function DashboardLayout({
     redirect("/auth/login");
   }
   return (
+    <BreadcrumbProvider>
     <HeaderActionsProvider>
       <SidebarProvider>
         <AppSidebar />
@@ -37,9 +40,12 @@ export default async function DashboardLayout({
               <HeaderActionsSlot />
             </div>
           </header>
-          <main className="flex-1 overflow-y-auto p-5">{children}</main>
+          <main className="flex-1 overflow-y-auto p-5">
+              <PageTransition>{children}</PageTransition>
+            </main>
         </SidebarInset>
       </SidebarProvider>
     </HeaderActionsProvider>
+    </BreadcrumbProvider>
   );
 }

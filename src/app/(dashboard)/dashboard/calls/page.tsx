@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -15,20 +16,38 @@ import { NewCallButton } from "./call-form";
 import { RowActions } from "./row-actions";
 import { formatDate } from "@/lib/format";
 import type { CallWithClient } from "@/lib/types";
+import { CallFilters } from "./filters";
 
 export const metadata: Metadata = {
   title: "Calls",
   robots: { index: false, follow: false },
 };
 
-export default async function CallsPage() {
+export default async function CallsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string; client?: string }>;
+}) {
+  const params = await searchParams;
+  const search = params.search?.trim() || "";
+  const clientFilter = params.client || "";
+
   const supabase = await createClient();
 
+  let callsQuery = supabase
+    .from("calls")
+    .select("*, clients(id, name, company)")
+    .order("call_date", { ascending: false });
+
+  if (search) {
+    callsQuery = callsQuery.ilike("title", `%${search}%`);
+  }
+  if (clientFilter && clientFilter !== "all") {
+    callsQuery = callsQuery.eq("client_id", clientFilter);
+  }
+
   const [{ data: rawCalls }, { data: clients }] = await Promise.all([
-    supabase
-      .from("calls")
-      .select("*, clients(id, name, company)")
-      .order("call_date", { ascending: false }),
+    callsQuery,
     supabase.from("clients").select("id, name, company").order("name"),
   ]);
 
@@ -47,6 +66,10 @@ export default async function CallsPage() {
         description={`${calls?.length ?? 0} call${calls?.length === 1 ? "" : "s"} logged.`}
         action={<NewCallButton clients={safeClients} />}
       />
+
+      <Suspense>
+        <CallFilters clients={safeClients} />
+      </Suspense>
 
       {calls && calls.length > 0 ? (
         <Card>

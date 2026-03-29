@@ -1,33 +1,70 @@
 import type { LucideIcon } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
-export function StatCard({
-  title,
-  value,
-  description,
-  icon: Icon,
-}: {
-  title: string;
-  value: string;
-  description: string;
+interface StatProps {
   icon: LucideIcon;
+  label: string;
+  value: string | number;
+  prefix?: string;
+  className?: string;
+}
+
+export function Stat({
+  icon: Icon,
+  label,
+  value,
+  prefix,
+  className,
+}: StatProps) {
+  const formatted =
+    typeof value === "number" ? value.toLocaleString() : value;
+
+  return (
+    <div className={cn("flex flex-col gap-3 p-4", className)}>
+      <div className="flex items-center gap-1.5">
+        <Icon className="size-3.5 text-muted-foreground shrink-0" />
+        <span className="text-sm font-medium leading-none tracking-tight">
+          {label}
+        </span>
+      </div>
+      <div className="text-[22px] font-medium leading-none tracking-tight">
+        {prefix && (
+          <span className="text-muted-foreground">{prefix}</span>
+        )}
+        <span>{formatted}</span>
+      </div>
+    </div>
+  );
+}
+
+const columnClasses: Record<number, string> = {
+  1: "sm:grid-cols-1",
+  2: "sm:grid-cols-2",
+  3: "sm:grid-cols-3",
+  4: "sm:grid-cols-4",
+  5: "sm:grid-cols-5",
+  6: "sm:grid-cols-6",
+};
+
+export function StatGroup({
+  children,
+  columns = 4,
+  className,
+}: {
+  children: React.ReactNode;
+  columns?: 1 | 2 | 3 | 4 | 5 | 6;
+  className?: string;
 }) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <Icon className="size-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <CardDescription>{description}</CardDescription>
-      </CardContent>
-    </Card>
+    <div
+      className={cn(
+        "grid grid-cols-2",
+        columnClasses[columns],
+        "rounded-xl ring-1 ring-foreground/10 overflow-hidden [&>*+*]:border-l [&>*]:border-b [&>:nth-last-child(-n+2)]:border-b-0 sm:[&>*]:border-b-0",
+        className,
+      )}
+    >
+      {children}
+    </div>
   );
 }

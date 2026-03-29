@@ -1,30 +1,52 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { NewClientButton } from "./client-form";
 import { RowActions } from "./row-actions";
+import { ClientFilters } from "./filters";
 
 export const metadata: Metadata = {
   title: "Clients",
   robots: { index: false, follow: false },
 };
 
-export default async function ClientsPage() {
+export default async function ClientsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string; status?: string; industry?: string }>;
+}) {
+  const params = await searchParams;
+  const search = params.search?.trim() || "";
+  const status = params.status || "";
+  const industry = params.industry || "";
+
   const supabase = await createClient();
 
-  const { data: clients } = await supabase
+  let query = supabase
     .from("clients")
     .select("*")
     .order("created_at", { ascending: false });
+
+  if (search) {
+    query = query.or(
+      `name.ilike.%${search}%,company.ilike.%${search}%,email.ilike.%${search}%`,
+    );
+  }
+  if (status && status !== "all") {
+    query = query.eq("status", status);
+  } else {
+    query = query.neq("status", "partial");
+  }
+  if (industry && industry !== "all") {
+    query = query.eq("industry", industry);
+  }
+
+  const { data: clients } = await query;
 
   return (
     <div className="space-y-5">
@@ -34,11 +56,12 @@ export default async function ClientsPage() {
         action={<NewClientButton />}
       />
 
+      <Suspense>
+        <ClientFilters />
+      </Suspense>
+
       {clients && clients.length > 0 ? (
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">All Clients</CardTitle>
-          </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

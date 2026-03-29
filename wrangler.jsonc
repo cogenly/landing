@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cogenly",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2024-12-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "routes": [
+    {
+      "pattern": "cogenly.com/*",
+      "zone_name": "cogenly.com"
+    },
+    {
+      "pattern": "www.cogenly.com/*",
+      "zone_name": "cogenly.com"
+    }
+  ]
+}
