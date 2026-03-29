@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 
 const clientStatusColors: Record<string, string> = {
+  partial: "bg-orange-100 text-orange-700",
   lead: "bg-blue-100 text-blue-700",
   call_scheduled: "bg-yellow-100 text-yellow-700",
   proposal: "bg-purple-100 text-purple-700",
@@ -10,6 +11,7 @@ const clientStatusColors: Record<string, string> = {
 };
 
 const clientStatusLabels: Record<string, string> = {
+  partial: "Partial",
   lead: "Lead",
   call_scheduled: "Call Scheduled",
   proposal: "Proposal",

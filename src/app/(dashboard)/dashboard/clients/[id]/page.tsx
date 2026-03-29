@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Field } from "@/components/dashboard/field";
+import { TIMELINES, COMMITMENT_LEVELS, AI_EXPERIENCE, TEAM_SIZES, HOURS_WASTED, DECISION_MAKERS } from "@/lib/questions";
 import { EditClientButton } from "./edit-client-button";
 
 export async function generateMetadata({
@@ -34,6 +35,21 @@ export async function generateMetadata({
   };
 }
 
+const choiceLabels: Record<string, { label: string; key: string }[]> = {
+  aiExperience: AI_EXPERIENCE,
+  timeline: TIMELINES,
+  commitment: COMMITMENT_LEVELS,
+  teamSize: TEAM_SIZES,
+  hoursWasted: HOURS_WASTED,
+  decisionMaker: DECISION_MAKERS,
+};
+
+function resolveLabel(metadataKey: string, rawValue: string): string {
+  const options = choiceLabels[metadataKey];
+  if (!options) return rawValue;
+  return options.find((o) => o.key === rawValue)?.label ?? rawValue;
+}
+
 const metadataLabels: Record<string, string> = {
   whyWork: "Why they want to work with us",
   aiExperience: "AI experience",
@@ -52,6 +68,8 @@ const metadataLabels: Record<string, string> = {
   anythingElse: "Anything else",
   howFoundDetail: "How they found us (detail)",
   teamSizeBranch: "Team size detail",
+  last_step: "Last step reached",
+  startedAt: "Form started",
 };
 
 
@@ -173,7 +191,7 @@ export default async function ClientDetailPage({
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-2">
               {metadataEntries.map(([key, label]) => (
-                <Field key={key} label={label} value={metadata[key]} />
+                <Field key={key} label={label} value={resolveLabel(key, metadata[key])} />
               ))}
             </div>
           </CardContent>

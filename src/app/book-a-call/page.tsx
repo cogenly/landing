@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Logo } from "../components/logo";
 import Link from "next/link";
-import { submitIntake } from "./actions";
+import { submitIntake, createPartialClient } from "./actions";
 import {
   TEAM_SIZE_BRANCH_QUESTIONS,
   AI_BRANCH_QUESTIONS,
@@ -175,6 +175,7 @@ function isValidPhone(phone: string): boolean {
 
 export default function BookACallPage() {
   const [step, setStep] = useState<Step>("intro");
+  const [clientId, setClientId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
@@ -255,6 +256,16 @@ export default function BookACallPage() {
   const next = async () => {
     if (!validate()) return;
     const nextStep = nav.getNextStep(step);
+    if (step === "contact") {
+      createPartialClient({
+        firstName: data.firstName,
+        email: data.email,
+        phone: data.phone,
+        contactMethod: data.contactMethod,
+      }).then((result) => {
+        if ("clientId" in result && result.clientId) setClientId(result.clientId);
+      });
+    }
     if (nextStep === "done") {
       setSubmitting(true);
       setSubmitError(null);
@@ -268,7 +279,7 @@ export default function BookACallPage() {
         screenHeight: window.screen.height,
         url: window.location.href,
       };
-      const result = await submitIntake(data, metadata);
+      const result = await submitIntake(data, metadata, clientId ?? undefined);
       setSubmitting(false);
       if (result.error) {
         setSubmitError(result.error);

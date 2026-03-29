@@ -99,7 +99,52 @@ function calculateLeadScore(data: IntakeFormData): number {
   return score; // max 100
 }
 
-export async function submitIntake(formData: IntakeFormData, metadata?: Record<string, unknown>) {
+interface PartialClientData {
+  firstName: string;
+  email: string;
+  phone: string;
+  contactMethod: string;
+}
+
+export async function createPartialClient(data: PartialClientData) {
+  const supabase = createAdminClient();
+
+  // Dedup: check for existing partial record with same email
+  const { data: existing } = await supabase
+    .from("clients")
+    .select("id")
+    .eq("email", data.email)
+    .eq("status", "partial")
+    .maybeSingle();
+
+  if (existing) {
+    return { clientId: existing.id };
+  }
+
+  const { data: client, error } = await supabase
+    .from("clients")
+    .insert({
+      name: data.firstName,
+      email: data.email,
+      phone: data.phone,
+      preferred_contact: data.contactMethod,
+      status: "partial",
+      metadata: {
+        last_step: "contact",
+        startedAt: new Date().toISOString(),
+      },
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { clientId: client.id };
+}
+
+export async function submitIntake(formData: IntakeFormData, metadata?: Record<string, unknown>, clientId?: string) {
   const supabase = createAdminClient();
 
   const leadScore = calculateLeadScore(formData);
@@ -125,26 +170,41 @@ export async function submitIntake(formData: IntakeFormData, metadata?: Record<s
     ...metadata,
   };
 
+  const payload = {
+    name: formData.firstName,
+    email: formData.email,
+    phone: formData.phone,
+    company: formData.bizName,
+    website: formData.bizWebsite || null,
+    industry:
+      formData.businessType === "Other"
+        ? formData.businessTypeOther
+        : formData.businessType,
+    team_size: formData.teamSize,
+    revenue: formData.revenue,
+    status: "lead",
+    source: formData.howFound,
+    preferred_contact: formData.contactMethod,
+    lead_score: leadScore,
+    metadata: intakeData,
+  };
+
+  if (clientId) {
+    const { error } = await supabase
+      .from("clients")
+      .update(payload)
+      .eq("id", clientId);
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    return { success: true, clientId };
+  }
+
   const { data: client, error } = await supabase
     .from("clients")
-    .insert({
-      name: formData.firstName,
-      email: formData.email,
-      phone: formData.phone,
-      company: formData.bizName,
-      website: formData.bizWebsite || null,
-      industry:
-        formData.businessType === "Other"
-          ? formData.businessTypeOther
-          : formData.businessType,
-      team_size: formData.teamSize,
-      revenue: formData.revenue,
-      status: "lead",
-      source: formData.howFound,
-      preferred_contact: formData.contactMethod,
-      lead_score: leadScore,
-      metadata: intakeData,
-    })
+    .insert(payload)
     .select("id")
     .single();
 
