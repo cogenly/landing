@@ -9,6 +9,7 @@ import { AppSidebar } from "./app-sidebar";
 import { DashboardBreadcrumb } from "./breadcrumb";
 import {
   HeaderActionsProvider,
+  HeaderActionsSlot,
 } from "./header-actions";
 
 export default async function DashboardLayout({
@@ -32,6 +33,9 @@ export default async function DashboardLayout({
           <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border/50 bg-background/80 backdrop-blur-sm px-5 rounded-t-[inherit]">
             <SidebarTrigger className="-ml-1" />
             <DashboardBreadcrumb />
+            <div className="ml-auto">
+              <HeaderActionsSlot />
+            </div>
           </header>
           <main className="flex-1 overflow-y-auto p-5">{children}</main>
         </SidebarInset>
