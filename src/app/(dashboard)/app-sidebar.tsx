@@ -37,7 +37,7 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton render={<Link href="/dashboard" />} className="h-10 [&_img]:size-6 group-data-[collapsible=icon]:!p-0.5">
+            <SidebarMenuButton render={<Link href="/dashboard" />} className="h-10 [&_img]:size-6 group-data-[collapsible=icon]:!p-[5px]">
               <Image
                 src="/logo.png"
                 alt="Cogenly"
