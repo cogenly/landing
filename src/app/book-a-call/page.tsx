@@ -3,17 +3,58 @@
 import { useState, useRef, useEffect } from "react";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { StepProgress } from "@/components/form/step-progress";
 import {
   ArrowRight,
   ArrowLeft,
-  Check,
   ArrowUpLeft,
   Loader2,
 } from "lucide-react";
 import { Logo } from "../components/logo";
 import Link from "next/link";
 import { submitIntake } from "./actions";
+import {
+  TEAM_SIZE_BRANCH_QUESTIONS,
+  AI_BRANCH_QUESTIONS,
+  HOURS_WASTED_BRANCH_QUESTIONS,
+  DECISION_MAKER_BRANCH_QUESTIONS,
+  TIMELINE_BRANCH_QUESTIONS,
+  COMMITMENT_LEVELS,
+} from "@/lib/questions";
+import { createFlowNavigation } from "@/lib/form-navigation";
+import { IntroStep } from "./steps/intro-step";
+import { ContactStep } from "./steps/contact-step";
+import {
+  HowFoundStep,
+  HowFoundDetailStep,
+  WhyWorkStep,
+} from "./steps/discovery-steps";
+import {
+  BusinessStep,
+  BusinessTypeStep,
+  BusinessTypeOtherStep,
+  TeamSizeStep,
+  TeamSizeBranchStep,
+  AiExperienceStep,
+  AiBranchStep,
+} from "./steps/business-steps";
+import {
+  WhatToBuildStep,
+  CurrentProcessStep,
+  HoursWastedStep,
+  HoursWastedBranchStep,
+  SuccessStep,
+} from "./steps/process-steps";
+import {
+  DecisionMakerStep,
+  DecisionMakerBranchStep,
+  TimelineStep,
+  TimelineBranchStep,
+  CommitmentStep,
+  ConcernsStep,
+  RevenueStep,
+  AnythingElseStep,
+} from "./steps/qualification-steps";
 
 type Step =
   | "intro"
@@ -42,139 +83,6 @@ type Step =
   | "revenue"
   | "anything-else"
   | "done";
-
-const BUSINESS_TYPES = [
-  "E-commerce / Retail",
-  "Consulting / Professional Services",
-  "SaaS / Tech Startup",
-  "Healthcare / Wellness",
-  "Marketing / Advertising Agency",
-  "Finance / Accounting",
-  "Education / Training",
-  "Manufacturing / Industrial",
-  "Other",
-];
-
-const TEAM_SIZES = [
-  { label: "Just me", key: "solo" },
-  { label: "2-5 people", key: "small" },
-  { label: "6-20 people", key: "medium" },
-  { label: "20+ people", key: "large" },
-];
-
-const TEAM_SIZE_BRANCH_QUESTIONS: Record<string, string> = {
-  solo: "Are you the one doing the work you want automated?",
-  medium:
-    "Is there someone on your team who would manage the system day-to-day?",
-  large:
-    "Who would own this internally? Do you have technical staff on the team?",
-};
-
-const AI_EXPERIENCE = [
-  { label: "Yes, I've built some myself", key: "implemented" },
-  { label: "Yes, I've hired someone to build them", key: "agency" },
-  { label: "I've started but haven't finished", key: "stalled" },
-  { label: "No, this would be my first time", key: "new" },
-  { label: "Other", key: "other" },
-];
-
-const AI_BRANCH_QUESTIONS: Record<string, string> = {
-  implemented:
-    "What have you built so far, and what's making you consider working with a team?",
-  agency:
-    "What was your experience working with them, and what made you want to explore a different approach?",
-  stalled: "What have you tried so far, and where did things stall?",
-  new: "What got you interested in AI automation for your business?",
-  other: "Tell us more about your situation and what you're looking for.",
-};
-
-const HOURS_WASTED = [
-  { label: "Under 5 hours", key: "under5" },
-  { label: "5-15 hours", key: "5to15" },
-  { label: "15-40 hours", key: "15to40" },
-  { label: "40+ hours", key: "40plus" },
-];
-
-const HOURS_WASTED_BRANCH_QUESTIONS: Record<string, string> = {
-  "40plus": "How many people are spending their time on this?",
-};
-
-const DECISION_MAKERS = [
-  { label: "Yes, I make the final call", key: "sole" },
-  { label: "I decide with a partner or co-founder", key: "shared" },
-  { label: "Someone else needs to approve", key: "other" },
-];
-
-const DECISION_MAKER_BRANCH_QUESTIONS: Record<string, string> = {
-  shared: "Are they aligned on investing in automation?",
-  other:
-    "Who else is involved in the decision, and what matters most to them?",
-};
-
-const TIMELINES = [
-  { label: "As soon as possible", key: "asap" },
-  { label: "Within the next 2 weeks", key: "2weeks" },
-  { label: "Within the next month", key: "month" },
-  { label: "Just exploring for now", key: "exploring" },
-];
-
-const TIMELINE_BRANCH_QUESTIONS: Record<string, string> = {
-  asap: "What's driving the urgency?",
-  exploring: "What would need to happen for you to move forward?",
-};
-
-const COMMITMENT_LEVELS = [
-  {
-    label: "100% confident. That's why I'm applying.",
-    key: "100",
-    needsConcerns: false,
-  },
-  {
-    label: "80% confident. I just need to clarify some details.",
-    key: "80",
-    needsConcerns: false,
-  },
-  {
-    label: "40% confident. I need a conversation first.",
-    key: "40",
-    needsConcerns: true,
-  },
-  {
-    label: "Not sure yet. I'm still figuring things out.",
-    key: "0",
-    needsConcerns: true,
-  },
-];
-
-const REVENUE_RANGES = [
-  "$5k - $10k / month",
-  "$10k - $15k / month",
-  "$15k - $50k / month",
-  "$50k+ / month",
-];
-
-const HOW_FOUND = [
-  "YouTube",
-  "Instagram",
-  "LinkedIn",
-  "Someone referred me",
-  "Google search",
-  "Other",
-];
-
-const HOW_FOUND_DETAIL_QUESTIONS: Record<string, string> = {
-  YouTube: "Which video or topic brought you here?",
-  Instagram: "What content caught your attention?",
-  LinkedIn: "What post or profile caught your attention?",
-  "Someone referred me": "Who referred you?",
-  "Google search": "What were you searching for?",
-  Other: "How did you find us?",
-};
-
-const CONTACT_METHODS = [
-  { label: "iMessage", key: "imessage" },
-  { label: "WhatsApp", key: "whatsapp" },
-];
 
 const FLOW: Step[] = [
   "intro",
@@ -256,73 +164,6 @@ function shouldSkip(step: Step, data: FormData): boolean {
   return false;
 }
 
-function getNextStep(current: Step, data: FormData): Step {
-  const idx = FLOW.indexOf(current);
-  for (let i = idx + 1; i < FLOW.length; i++) {
-    if (!shouldSkip(FLOW[i], data)) return FLOW[i];
-  }
-  return "done";
-}
-
-function getPrevStep(current: Step, data: FormData): Step | null {
-  const idx = FLOW.indexOf(current);
-  for (let i = idx - 1; i >= 0; i--) {
-    if (!shouldSkip(FLOW[i], data)) return FLOW[i];
-  }
-  return null;
-}
-
-function ChoiceButton({
-  selected,
-  onClick,
-  children,
-  shortcut,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-  shortcut?: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "flex w-full items-center gap-3 rounded-lg border px-5 py-3.5 text-left text-sm transition-all",
-        selected
-          ? "border-primary bg-primary/5 text-foreground"
-          : "border-border bg-background text-muted-foreground hover:border-primary/50 hover:bg-muted/50"
-      )}
-    >
-      {shortcut && (
-        <span
-          className={cn(
-            "flex h-6 w-6 shrink-0 items-center justify-center rounded border text-xs font-medium",
-            selected
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border"
-          )}
-        >
-          {shortcut}
-        </span>
-      )}
-      <span className="flex-1">{children}</span>
-      {selected && <Check className="h-4 w-4 shrink-0 text-primary" />}
-    </button>
-  );
-}
-
-function StepProgress({ current, total }: { current: number; total: number }) {
-  return (
-    <div className="h-1 w-full animate-in fade-in duration-500 overflow-hidden rounded-full bg-muted">
-      <div
-        className="h-full rounded-full bg-primary transition-all duration-500"
-        style={{ width: `${(current / total) * 100}%` }}
-      />
-    </div>
-  );
-}
-
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -351,10 +192,10 @@ export default function BookACallPage() {
       }
     });
     ro.observe(innerRef.current);
-    // set initial height
     setContentHeight(innerRef.current.scrollHeight);
     return () => ro.disconnect();
   }, [step]);
+
   const [data, setData] = useState<FormData>({
     firstName: "",
     email: "",
@@ -391,6 +232,8 @@ export default function BookACallPage() {
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
+  const nav = createFlowNavigation(FLOW, (s) => shouldSkip(s, data));
+
   const validate = (): boolean => {
     if (step === "contact") {
       const newErrors: Partial<Record<keyof FormData, string>> = {};
@@ -411,7 +254,7 @@ export default function BookACallPage() {
 
   const next = async () => {
     if (!validate()) return;
-    const nextStep = getNextStep(step, data);
+    const nextStep = nav.getNextStep(step);
     if (nextStep === "done") {
       setSubmitting(true);
       setSubmitError(null);
@@ -434,8 +277,9 @@ export default function BookACallPage() {
     }
     setStep(nextStep);
   };
+
   const prev = () => {
-    const p = getPrevStep(step, data);
+    const p = nav.getPrevStep(step);
     if (p) setStep(p);
   };
 
@@ -523,7 +367,7 @@ export default function BookACallPage() {
         <div className="flex-1" />
         {step !== "intro" && step !== "done" && (
           <div className="hidden sm:block sm:w-72 md:w-96">
-            <StepProgress current={currentStepIndex} total={totalSteps} />
+            <StepProgress current={currentStepIndex} total={totalSteps} className="animate-in fade-in duration-500" />
           </div>
         )}
         <div className="flex-1" />
@@ -548,10 +392,8 @@ export default function BookACallPage() {
               </h2>
               <p className="mx-auto mt-4 max-w-sm text-[15px] leading-relaxed text-muted-foreground">
                 Our team will review this and reach out via{" "}
-                {data.contactMethod === "whatsapp"
-                  ? "WhatsApp"
-                  : "text"}{" "}
-                to discuss next steps. Talk soon.
+                {data.contactMethod === "whatsapp" ? "WhatsApp" : "text"} to
+                discuss next steps. Talk soon.
               </p>
               <Link href="/">
                 <Button className="mt-8" variant="outline">
@@ -571,565 +413,123 @@ export default function BookACallPage() {
                 className="transition-[height] duration-300 ease-in-out"
                 style={{ height: contentHeight, overflow: "hidden" }}
               >
-              <div ref={innerRef}>
-              <BlurFade key={step} delay={0.05}>
-                {step === "intro" && (
-                  <div className="space-y-6 text-center">
-                    <div className="space-y-4">
-                      <div className="inline-flex items-center rounded-full border border-border bg-background px-4 py-1.5 shadow-sm">
-                        <span className="text-sm font-medium text-muted-foreground">
-                          Limited availability
-                        </span>
-                      </div>
-                      <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                        Apply to Work With Us
-                      </h2>
-                    </div>
-                    <p className="mx-auto max-w-md text-[15px] leading-relaxed text-muted-foreground">
-                      We take on a limited number of clients so every project
-                      gets the attention it deserves. This application helps us
-                      understand your business and whether we're the right fit.
-                    </p>
-                    <div className="mx-auto max-w-sm rounded-lg bg-muted/60 px-5 py-3.5 text-sm text-muted-foreground">
-                      Takes about 5-10 minutes. We read every one.
-                    </div>
-                  </div>
-                )}
-
-                {step === "contact" && (
-                  <div className="space-y-4">
-                    <div>
-                      <h2 className="text-xl font-bold">
-                        Let's start with the basics.
-                      </h2>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        We'll use this to reach out if we're a good fit.
-                      </p>
-                    </div>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium">
-                        First name
-                      </label>
-                      <input
-                        type="text"
-                        value={data.firstName}
-                        onChange={(e) => update("firstName", e.target.value)}
-                        className={cn(
-                          "w-full rounded-lg border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary",
-                          errors.firstName ? "border-red-400" : "border-border"
-                        )}
-                        placeholder="Alex"
-                        autoFocus
+                <div ref={innerRef}>
+                  <BlurFade key={step} delay={0.05}>
+                    {step === "intro" && <IntroStep />}
+                    {step === "contact" && (
+                      <ContactStep
+                        data={data}
+                        update={update}
+                        errors={errors}
                       />
-                      {errors.firstName && (
-                        <p className="mt-1 text-xs text-red-500">{errors.firstName}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium">
-                        Email address
-                      </label>
-                      <input
-                        type="email"
-                        value={data.email}
-                        onChange={(e) => update("email", e.target.value)}
-                        className={cn(
-                          "w-full rounded-lg border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary",
-                          errors.email ? "border-red-400" : "border-border"
-                        )}
-                        placeholder="alex@company.com"
+                    )}
+                    {step === "how-found" && (
+                      <HowFoundStep
+                        data={data}
+                        update={update}
+                        autoAdvance={autoAdvance}
                       />
-                      {errors.email && (
-                        <p className="mt-1 text-xs text-red-500">{errors.email}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium">
-                        Phone number
-                      </label>
-                      <input
-                        type="tel"
-                        value={data.phone}
-                        onChange={(e) => update("phone", e.target.value)}
-                        className={cn(
-                          "w-full rounded-lg border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary",
-                          errors.phone ? "border-red-400" : "border-border"
-                        )}
-                        placeholder="+1 (555) 000-0000"
+                    )}
+                    {step === "how-found-detail" && (
+                      <HowFoundDetailStep data={data} update={update} />
+                    )}
+                    {step === "why-work" && (
+                      <WhyWorkStep data={data} update={update} />
+                    )}
+                    {step === "business" && (
+                      <BusinessStep data={data} update={update} />
+                    )}
+                    {step === "business-type" && (
+                      <BusinessTypeStep
+                        data={data}
+                        update={update}
+                        autoAdvance={autoAdvance}
                       />
-                      {errors.phone && (
-                        <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium">
-                        How should we reach you?
-                      </label>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => update("contactMethod", "imessage")}
-                          className={cn(
-                            "flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all",
-                            data.contactMethod === "imessage"
-                              ? "border-primary bg-primary/5 text-foreground"
-                              : "border-border text-muted-foreground hover:border-primary/50"
-                          )}
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/0e/08/07/0e080793-1b66-d9b3-0bbe-8222669abf79/messages-0-0-1x_U007epad-0-1-0-sRGB-85-220.png/512x512bb.png"
-                            alt="iMessage"
-                            width={24}
-                            height={24}
-                            className="rounded-md"
-                          />
-                          iMessage
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => update("contactMethod", "whatsapp")}
-                          className={cn(
-                            "flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all",
-                            data.contactMethod === "whatsapp"
-                              ? "border-primary bg-primary/5 text-foreground"
-                              : "border-border text-muted-foreground hover:border-primary/50"
-                          )}
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/c0/94/ab/c094ab41-a44a-4da8-737f-7aad8d97b8b6/AppIcon-0-0-1x_U007epad-0-0-0-1-0-0-sRGB-0-85-220.png/512x512bb.png"
-                            alt="WhatsApp"
-                            width={24}
-                            height={24}
-                            className="rounded-md"
-                          />
-                          WhatsApp
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {step === "how-found" && (
-                  <div className="space-y-2.5">
-                    <h2 className="mb-3 text-xl font-bold">
-                      How did you hear about us?
-                    </h2>
-                    {HOW_FOUND.map((option, i) => (
-                      <ChoiceButton
-                        key={option}
-                        selected={data.howFound === option}
-                        onClick={() => { update("howFound", option); autoAdvance(); }}
-                        shortcut={String.fromCharCode(65 + i)}
-                      >
-                        {option}
-                      </ChoiceButton>
-                    ))}
-                  </div>
-                )}
-
-                {step === "how-found-detail" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      {HOW_FOUND_DETAIL_QUESTIONS[data.howFound]}
-                    </h2>
-                    <input
-                      type="text"
-                      value={data.howFoundDetail}
-                      onChange={(e) =>
-                        update("howFoundDetail", e.target.value)
-                      }
-                      className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="Type your answer here..."
-                      autoFocus
-                    />
-                  </div>
-                )}
-
-                {step === "why-work" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      What made you want to work with us?
-                    </h2>
-                    <textarea
-                      value={data.whyWork}
-                      onChange={(e) => update("whyWork", e.target.value)}
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="Type your answer here..."
-                      autoFocus
-                    />
-                  </div>
-                )}
-
-                {step === "business" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      Tell us about your business.
-                    </h2>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium">
-                        Business name
-                      </label>
-                      <input
-                        type="text"
-                        value={data.bizName}
-                        onChange={(e) => update("bizName", e.target.value)}
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                        autoFocus
+                    )}
+                    {step === "business-type-other" && (
+                      <BusinessTypeOtherStep data={data} update={update} />
+                    )}
+                    {step === "team-size" && (
+                      <TeamSizeStep
+                        data={data}
+                        update={update}
+                        autoAdvance={autoAdvance}
                       />
-                    </div>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium">
-                        Website URL (optional)
-                      </label>
-                      <input
-                        type="url"
-                        value={data.bizWebsite}
-                        onChange={(e) => update("bizWebsite", e.target.value)}
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                        placeholder="https://"
+                    )}
+                    {step === "team-size-branch" && (
+                      <TeamSizeBranchStep data={data} update={update} />
+                    )}
+                    {step === "ai-experience" && (
+                      <AiExperienceStep
+                        data={data}
+                        update={update}
+                        autoAdvance={autoAdvance}
                       />
-                    </div>
-                  </div>
-                )}
-
-                {step === "business-type" && (
-                  <div className="space-y-3">
-                    <h2 className="mb-4 text-xl font-bold">
-                      Which best describes your business?
-                    </h2>
-                    {BUSINESS_TYPES.map((type, i) => (
-                      <ChoiceButton
-                        key={type}
-                        selected={data.businessType === type}
-                        onClick={() => { update("businessType", type); autoAdvance(); }}
-                        shortcut={String.fromCharCode(65 + i)}
-                      >
-                        {type}
-                      </ChoiceButton>
-                    ))}
-                  </div>
-                )}
-
-                {step === "business-type-other" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      Tell us what your business does.
-                    </h2>
-                    <textarea
-                      value={data.businessTypeOther}
-                      onChange={(e) =>
-                        update("businessTypeOther", e.target.value)
-                      }
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="What industry are you in, and what does your business do?"
-                      autoFocus
-                    />
-                  </div>
-                )}
-
-                {step === "team-size" && (
-                  <div className="space-y-3">
-                    <h2 className="mb-4 text-xl font-bold">
-                      How big is your team?
-                    </h2>
-                    {TEAM_SIZES.map((option, i) => (
-                      <ChoiceButton
-                        key={option.key}
-                        selected={data.teamSize === option.key}
-                        onClick={() => { update("teamSize", option.key); autoAdvance(); }}
-                        shortcut={String.fromCharCode(65 + i)}
-                      >
-                        {option.label}
-                      </ChoiceButton>
-                    ))}
-                  </div>
-                )}
-
-                {step === "team-size-branch" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      {TEAM_SIZE_BRANCH_QUESTIONS[data.teamSize]}
-                    </h2>
-                    <textarea
-                      value={data.teamSizeBranch}
-                      onChange={(e) =>
-                        update("teamSizeBranch", e.target.value)
-                      }
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="Type your answer here..."
-                      autoFocus
-                    />
-                  </div>
-                )}
-
-                {step === "ai-experience" && (
-                  <div className="space-y-3">
-                    <h2 className="mb-4 text-xl font-bold">
-                      Have you used AI or automation in your business before?
-                    </h2>
-                    {AI_EXPERIENCE.map((option, i) => (
-                      <ChoiceButton
-                        key={option.key}
-                        selected={data.aiExperience === option.key}
-                        onClick={() => { update("aiExperience", option.key); autoAdvance(); }}
-                        shortcut={String.fromCharCode(65 + i)}
-                      >
-                        {option.label}
-                      </ChoiceButton>
-                    ))}
-                  </div>
-                )}
-
-                {step === "ai-branch" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      {AI_BRANCH_QUESTIONS[data.aiExperience]}
-                    </h2>
-                    <textarea
-                      value={data.aiBranch}
-                      onChange={(e) => update("aiBranch", e.target.value)}
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="Type your answer here..."
-                      autoFocus
-                    />
-                  </div>
-                )}
-
-                {step === "what-to-build" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      What would you want us to build or automate for you?
-                    </h2>
-                    <textarea
-                      value={data.whatToBuild}
-                      onChange={(e) => update("whatToBuild", e.target.value)}
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="Type your answer here..."
-                      autoFocus
-                    />
-                  </div>
-                )}
-
-                {step === "current-process" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      Walk us through how this is done today, step by step.
-                    </h2>
-                    <p className="text-sm text-muted-foreground">
-                      The more detail you give, the better we can scope what to
-                      build.
-                    </p>
-                    <textarea
-                      value={data.currentProcess}
-                      onChange={(e) =>
-                        update("currentProcess", e.target.value)
-                      }
-                      className="min-h-[150px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="First we... then... after that..."
-                      autoFocus
-                    />
-                  </div>
-                )}
-
-                {step === "hours-wasted" && (
-                  <div className="space-y-3">
-                    <h2 className="mb-4 text-xl font-bold">
-                      {data.teamSize === "solo"
-                        ? "How many hours per week do you spend on this?"
-                        : "How many hours per week does your team spend on this?"}
-                    </h2>
-                    {HOURS_WASTED.map((option, i) => (
-                      <ChoiceButton
-                        key={option.key}
-                        selected={data.hoursWasted === option.key}
-                        onClick={() => { update("hoursWasted", option.key); autoAdvance(); }}
-                        shortcut={String.fromCharCode(65 + i)}
-                      >
-                        {option.label}
-                      </ChoiceButton>
-                    ))}
-                  </div>
-                )}
-
-                {step === "hours-wasted-branch" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      {HOURS_WASTED_BRANCH_QUESTIONS[data.hoursWasted]}
-                    </h2>
-                    <textarea
-                      value={data.hoursWastedBranch}
-                      onChange={(e) =>
-                        update("hoursWastedBranch", e.target.value)
-                      }
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="Type your answer here..."
-                      autoFocus
-                    />
-                  </div>
-                )}
-
-                {step === "success" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      If this project goes perfectly, what does that look like
-                      for your business?
-                    </h2>
-                    <textarea
-                      value={data.success}
-                      onChange={(e) => update("success", e.target.value)}
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="Type your answer here..."
-                      autoFocus
-                    />
-                  </div>
-                )}
-
-                {step === "decision-maker" && (
-                  <div className="space-y-3">
-                    <h2 className="mb-4 text-xl font-bold">
-                      Are you the decision maker for this project?
-                    </h2>
-                    {DECISION_MAKERS.map((option, i) => (
-                      <ChoiceButton
-                        key={option.key}
-                        selected={data.decisionMaker === option.key}
-                        onClick={() => { update("decisionMaker", option.key); autoAdvance(); }}
-                        shortcut={String.fromCharCode(65 + i)}
-                      >
-                        {option.label}
-                      </ChoiceButton>
-                    ))}
-                  </div>
-                )}
-
-                {step === "decision-maker-branch" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      {DECISION_MAKER_BRANCH_QUESTIONS[data.decisionMaker]}
-                    </h2>
-                    <textarea
-                      value={data.decisionMakerBranch}
-                      onChange={(e) =>
-                        update("decisionMakerBranch", e.target.value)
-                      }
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="Type your answer here..."
-                      autoFocus
-                    />
-                  </div>
-                )}
-
-                {step === "timeline" && (
-                  <div className="space-y-3">
-                    <h2 className="mb-4 text-xl font-bold">
-                      How soon are you looking to get started?
-                    </h2>
-                    {TIMELINES.map((option, i) => (
-                      <ChoiceButton
-                        key={option.key}
-                        selected={data.timeline === option.key}
-                        onClick={() => { update("timeline", option.key); autoAdvance(); }}
-                        shortcut={String.fromCharCode(65 + i)}
-                      >
-                        {option.label}
-                      </ChoiceButton>
-                    ))}
-                  </div>
-                )}
-
-                {step === "timeline-branch" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      {TIMELINE_BRANCH_QUESTIONS[data.timeline]}
-                    </h2>
-                    <textarea
-                      value={data.timelineBranch}
-                      onChange={(e) =>
-                        update("timelineBranch", e.target.value)
-                      }
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="Type your answer here..."
-                      autoFocus
-                    />
-                  </div>
-                )}
-
-                {step === "commitment" && (
-                  <div className="space-y-3">
-                    <h2 className="mb-4 text-xl font-bold">
-                      How committed are you to partnering with our team?
-                    </h2>
-                    {COMMITMENT_LEVELS.map((option, i) => (
-                      <ChoiceButton
-                        key={option.key}
-                        selected={data.commitment === option.key}
-                        onClick={() => { update("commitment", option.key); autoAdvance(); }}
-                        shortcut={String.fromCharCode(65 + i)}
-                      >
-                        {option.label}
-                      </ChoiceButton>
-                    ))}
-                  </div>
-                )}
-
-                {step === "concerns" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      What questions or concerns do you have?
-                    </h2>
-                    <textarea
-                      value={data.concerns}
-                      onChange={(e) => update("concerns", e.target.value)}
-                      className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="Type your answer here..."
-                      autoFocus
-                    />
-                  </div>
-                )}
-
-                {step === "revenue" && (
-                  <div className="space-y-3">
-                    <h2 className="mb-4 text-xl font-bold">
-                      What's your current monthly revenue?
-                    </h2>
-                    {REVENUE_RANGES.map((range, i) => (
-                      <ChoiceButton
-                        key={range}
-                        selected={data.revenue === range}
-                        onClick={() => { update("revenue", range); autoAdvance(); }}
-                        shortcut={String.fromCharCode(65 + i)}
-                      >
-                        {range}
-                      </ChoiceButton>
-                    ))}
-                  </div>
-                )}
-
-
-                {step === "anything-else" && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold">
-                      Anything else we should know?
-                    </h2>
-                    <p className="text-sm text-muted-foreground">
-                      Optional. If there's context that didn't fit anywhere
-                      else, drop it here.
-                    </p>
-                    <textarea
-                      value={data.anythingElse}
-                      onChange={(e) =>
-                        update("anythingElse", e.target.value)
-                      }
-                      className="min-h-[100px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-base sm:text-sm outline-none transition-colors focus:border-primary"
-                      placeholder="Type your answer here..."
-                      autoFocus
-                    />
-                  </div>
-                )}
-              </BlurFade>
-              </div>
+                    )}
+                    {step === "ai-branch" && (
+                      <AiBranchStep data={data} update={update} />
+                    )}
+                    {step === "what-to-build" && (
+                      <WhatToBuildStep data={data} update={update} />
+                    )}
+                    {step === "current-process" && (
+                      <CurrentProcessStep data={data} update={update} />
+                    )}
+                    {step === "hours-wasted" && (
+                      <HoursWastedStep
+                        data={data}
+                        update={update}
+                        autoAdvance={autoAdvance}
+                      />
+                    )}
+                    {step === "hours-wasted-branch" && (
+                      <HoursWastedBranchStep data={data} update={update} />
+                    )}
+                    {step === "success" && (
+                      <SuccessStep data={data} update={update} />
+                    )}
+                    {step === "decision-maker" && (
+                      <DecisionMakerStep
+                        data={data}
+                        update={update}
+                        autoAdvance={autoAdvance}
+                      />
+                    )}
+                    {step === "decision-maker-branch" && (
+                      <DecisionMakerBranchStep data={data} update={update} />
+                    )}
+                    {step === "timeline" && (
+                      <TimelineStep
+                        data={data}
+                        update={update}
+                        autoAdvance={autoAdvance}
+                      />
+                    )}
+                    {step === "timeline-branch" && (
+                      <TimelineBranchStep data={data} update={update} />
+                    )}
+                    {step === "commitment" && (
+                      <CommitmentStep
+                        data={data}
+                        update={update}
+                        autoAdvance={autoAdvance}
+                      />
+                    )}
+                    {step === "concerns" && (
+                      <ConcernsStep data={data} update={update} />
+                    )}
+                    {step === "revenue" && (
+                      <RevenueStep
+                        data={data}
+                        update={update}
+                        autoAdvance={autoAdvance}
+                      />
+                    )}
+                    {step === "anything-else" && (
+                      <AnythingElseStep data={data} update={update} />
+                    )}
+                  </BlurFade>
+                </div>
               </div>
 
               {submitError && (

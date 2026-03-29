@@ -37,18 +37,15 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<Link href="/dashboard" />} className="gap-1.5 group-data-[collapsible=icon]:gap-0">
+            <SidebarMenuButton render={<Link href="/dashboard" />} className="h-10 [&_svg]:size-5">
               <Image
                 src="/logo.png"
                 alt="Cogenly"
-                width={24}
-                height={24}
-                className="size-6 shrink-0"
+                width={20}
+                height={20}
+                className="shrink-0"
               />
-              <span
-                className="overflow-hidden whitespace-nowrap text-lg font-bold tracking-tighter transition-[width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0"
-                data-logo-text
-              >
+              <span className="text-base font-bold tracking-tighter">
                 cogenly
               </span>
             </SidebarMenuButton>

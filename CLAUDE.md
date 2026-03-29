@@ -19,10 +19,12 @@ Everything Cogenly lives here. Marketing site, client operations, integrations, 
 | Layer | Tool | Purpose |
 |-------|------|---------|
 | Platform | Next.js (this repo) | Marketing site + admin dashboard |
-| Data | Supabase | Clients, calls, projects, intake submissions |
+| Data | Supabase | Clients, calls, intake submissions |
 | Code | GitHub (`cogenly` org) | This repo + per-client repos |
-| Domain | Cloudflare Registrar | cogenly.com |
+| Domain | Namecheap | cogenly.com |
+| DNS | Cloudflare | DNS + Workers + Pages via OpenNext |
 | Banking | Mercury | Business account + invoicing |
+| Registered Agent | Northwest Registered Agent | LLC / business registration |
 | Acquisition | LinkedIn | Outreach + content |
 | Playbooks | Notion | Sales framework, offer stack, call prep |
 | AI Brain | Claude Code | Orchestration, automation, glue |
@@ -61,21 +63,19 @@ platform/
 
 ### Supabase Schema
 
-Tables: `clients`, `calls`, `projects`, `decisions`, `profiles`
+Tables: `clients`, `calls`, `profiles`
 
 See `supabase/migrations/` for full schema. Key migrations:
 - `001_initial_schema.sql` - core business tables
 - `002_profiles.sql` - user profiles linked to Supabase Auth, auto-created on signup
+- `003_remove_projects_transcripts.sql` - removed projects, decisions tables and transcript_path from calls
 
 ### What Lives Where
 
 | Data | Where | Why |
 |------|-------|-----|
 | Client info, status, pipeline | Supabase | Queryable, intake form writes here |
-| Call transcripts (full text) | Git `clients/<name>/transcripts/` | Long docs, Claude reads directly |
 | Call metadata (date, outcome) | Supabase `calls` table | Queryable |
-| Architecture decisions | Git `clients/<name>/architecture/` + Supabase | Detail in git, metadata in db |
-| Project status | Supabase `projects` table | Pipeline tracking |
 | Offers, sales framework | Notion | Low volume, already exists |
 | Marketing copy | `src/lib/data.ts` | Edit copy here, not in components |
 
@@ -95,8 +95,6 @@ See `supabase/migrations/` for full schema. Key migrations:
    > Notification sent
 
 2. DISCOVERY CALL
-   > Record and transcribe call
-   > Save transcript: clients/<name>/transcripts/discovery_YYYYMMDD.md
    > Log metadata to Supabase calls table
    > Update client status: call_scheduled
 
@@ -114,13 +112,10 @@ See `supabase/migrations/` for full schema. Key migrations:
 
 5. BUILD & DELIVER
    > Work in cogenly/client-<name> repo
-   > Log decisions in clients/<name>/architecture/
-   > Track project in Supabase
 
 6. RETAIN
    > Monthly Mercury invoice (retainer)
    > Check-in calls logged
-   > Patterns extracted to patterns/
 ```
 
 ## Auth
@@ -166,5 +161,3 @@ See `supabase/migrations/` for full schema. Key migrations:
 - Git is source of truth for documents
 - Notion only for personal playbooks (sales framework, offers). NOT for client data.
 - Mercury for all invoicing
-- Every call recorded and transcribed
-- Every architecture decision documented with reasoning

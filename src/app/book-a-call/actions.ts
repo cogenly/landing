@@ -104,6 +104,27 @@ export async function submitIntake(formData: IntakeFormData, metadata?: Record<s
 
   const leadScore = calculateLeadScore(formData);
 
+  const intakeData = {
+    whyWork: formData.whyWork,
+    aiExperience: formData.aiExperience,
+    aiBranch: formData.aiBranch,
+    whatToBuild: formData.whatToBuild,
+    currentProcess: formData.currentProcess,
+    hoursWasted: formData.hoursWasted,
+    hoursWastedBranch: formData.hoursWastedBranch,
+    success: formData.success,
+    decisionMaker: formData.decisionMaker,
+    decisionMakerBranch: formData.decisionMakerBranch,
+    timeline: formData.timeline,
+    timelineBranch: formData.timelineBranch,
+    commitment: formData.commitment,
+    concerns: formData.concerns,
+    anythingElse: formData.anythingElse,
+    howFoundDetail: formData.howFoundDetail,
+    teamSizeBranch: formData.teamSizeBranch,
+    ...metadata,
+  };
+
   const { data: client, error } = await supabase
     .from("clients")
     .insert({
@@ -122,7 +143,7 @@ export async function submitIntake(formData: IntakeFormData, metadata?: Record<s
       source: formData.howFound,
       preferred_contact: formData.contactMethod,
       lead_score: leadScore,
-      metadata: metadata ?? null,
+      metadata: intakeData,
     })
     .select("id")
     .single();

@@ -9,7 +9,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowRight, ArrowLeft, Check, MessageCircle } from "lucide-react";
+import { ArrowRight, ArrowLeft, MessageCircle } from "lucide-react";
+import { ChoiceButton } from "@/components/form/choice-button";
+import { StepProgress } from "@/components/form/step-progress";
+import { createFlowNavigation } from "@/lib/form-navigation";
+import { BUSINESS_TYPES, AI_EXPERIENCE, AI_BRANCH_QUESTIONS, TIMELINES, TIMELINE_BRANCH_QUESTIONS, COMMITMENT_LEVELS, REVENUE_RANGES, HOW_FOUND } from "@/lib/questions";
+import { FORM_INPUT_CLASS, FORM_TEXTAREA_CLASS, FORM_LABEL_CLASS } from "@/lib/form-styles";
 
 type Step =
   | "contact"
@@ -27,91 +32,6 @@ type Step =
   | "concerns"
   | "revenue"
   | "done";
-
-const BUSINESS_TYPES = [
-  "E-commerce / Retail",
-  "Consulting / Professional Services",
-  "SaaS / Tech Startup",
-  "Healthcare / Wellness",
-  "Marketing / Advertising Agency",
-  "Finance / Accounting",
-  "Education / Training",
-  "Manufacturing / Industrial",
-  "Other",
-];
-
-const AI_EXPERIENCE = [
-  { label: "Yes, I've implemented them myself", key: "implemented" },
-  { label: "Yes, I've hired an agency", key: "agency" },
-  { label: "Not fully implemented yet", key: "stalled" },
-  { label: "No, I need help setting them up", key: "new" },
-  { label: "Other", key: "other" },
-];
-
-const AI_BRANCH_QUESTIONS: Record<string, string> = {
-  implemented:
-    "What have you built so far, and what's making you consider done-for-you help?",
-  agency:
-    "What's your experience been working with them, and what made you want to explore a different approach?",
-  stalled: "What have you tried so far, and where did things stall?",
-  new: "What got you interested in AI automation for your business?",
-  other: "Tell us more about your situation and what you're looking for.",
-};
-
-const TIMELINES = [
-  { label: "As soon as possible", key: "asap" },
-  { label: "Within the next 2 weeks", key: "2weeks" },
-  { label: "Within the next month", key: "month" },
-  { label: "Just exploring for now", key: "exploring" },
-];
-
-const TIMELINE_BRANCH_QUESTIONS: Record<string, string> = {
-  asap: "What's driving the urgency?",
-  exploring: "What would need to happen for you to move forward?",
-};
-
-const COMMITMENT_LEVELS = [
-  {
-    label: "100% confident. That's why I'm applying.",
-    key: "100",
-    needsConcerns: false,
-  },
-  {
-    label: "80% confident. I just need to clarify some details.",
-    key: "80",
-    needsConcerns: false,
-  },
-  {
-    label: "40% confident. I need a chat and more time.",
-    key: "40",
-    needsConcerns: true,
-  },
-  {
-    label: "0% confident. I have no knowledge. I am not ready.",
-    key: "0",
-    needsConcerns: true,
-  },
-];
-
-const REVENUE_RANGES = [
-  "$5k - $10k / month",
-  "$10k - $15k / month",
-  "$15k - $50k / month",
-  "$50k+ / month",
-];
-
-const HOW_FOUND = [
-  "YouTube",
-  "Instagram",
-  "Someone referred me",
-  "Google search",
-  "Other",
-];
-
-const CONTACT_METHODS = [
-  { label: "iMessage", key: "imessage" },
-  { label: "WhatsApp", key: "whatsapp" },
-];
 
 const FLOW: Step[] = [
   "contact",
@@ -169,73 +89,6 @@ function shouldSkip(step: Step, data: FormData): boolean {
   return false;
 }
 
-function getNextStep(current: Step, data: FormData): Step {
-  const idx = FLOW.indexOf(current);
-  for (let i = idx + 1; i < FLOW.length; i++) {
-    if (!shouldSkip(FLOW[i], data)) return FLOW[i];
-  }
-  return "done";
-}
-
-function getPrevStep(current: Step, data: FormData): Step | null {
-  const idx = FLOW.indexOf(current);
-  for (let i = idx - 1; i >= 0; i--) {
-    if (!shouldSkip(FLOW[i], data)) return FLOW[i];
-  }
-  return null;
-}
-
-function ChoiceButton({
-  selected,
-  onClick,
-  children,
-  shortcut,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-  shortcut?: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "flex w-full items-center gap-3 rounded-lg border px-5 py-3.5 text-left text-sm transition-all",
-        selected
-          ? "border-primary bg-primary/5 text-foreground"
-          : "border-border bg-background text-muted-foreground hover:border-primary/50 hover:bg-muted/50"
-      )}
-    >
-      {shortcut && (
-        <span
-          className={cn(
-            "flex h-6 w-6 shrink-0 items-center justify-center rounded border text-xs font-medium",
-            selected
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border"
-          )}
-        >
-          {shortcut}
-        </span>
-      )}
-      <span className="flex-1">{children}</span>
-      {selected && <Check className="h-4 w-4 shrink-0 text-primary" />}
-    </button>
-  );
-}
-
-function StepProgress({ current, total }: { current: number; total: number }) {
-  return (
-    <div className="mb-0 h-1 w-full overflow-hidden rounded-full bg-muted">
-      <div
-        className="h-full rounded-full bg-primary transition-all duration-500"
-        style={{ width: `${(current / total) * 100}%` }}
-      />
-    </div>
-  );
-}
-
 export function IntakeForm({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("contact");
@@ -265,9 +118,11 @@ export function IntakeForm({ children }: { children: React.ReactNode }) {
   const update = (field: keyof FormData, value: string) =>
     setData((prev) => ({ ...prev, [field]: value }));
 
-  const next = () => setStep(getNextStep(step, data));
+  const nav = createFlowNavigation(FLOW, (s) => shouldSkip(s, data));
+
+  const next = () => setStep(nav.getNextStep(step));
   const prev = () => {
-    const p = getPrevStep(step, data);
+    const p = nav.getPrevStep(step);
     if (p) setStep(p);
   };
 
@@ -312,8 +167,6 @@ export function IntakeForm({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const handleKeyDown = (_e: React.KeyboardEvent) => {};
-
   const reset = () => {
     setStep("contact");
     setData({
@@ -349,7 +202,7 @@ export function IntakeForm({ children }: { children: React.ReactNode }) {
       }}
     >
       <DialogTrigger render={children as React.ReactElement}></DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg" onKeyDown={handleKeyDown} showCloseButton={false}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg" showCloseButton={false}>
         <DialogTitle className="sr-only">Project Application</DialogTitle>
         {step === "done" ? (
           <div className="py-12 text-center">
@@ -372,7 +225,7 @@ export function IntakeForm({ children }: { children: React.ReactNode }) {
           </div>
         ) : (
           <div className="flex flex-col gap-6">
-            <StepProgress current={currentStepIndex} total={totalSteps} />
+            <StepProgress current={currentStepIndex} total={totalSteps} className="mb-0" />
 
             <div>
               {step === "contact" && (
@@ -385,44 +238,44 @@ export function IntakeForm({ children }: { children: React.ReactNode }) {
                     </p>
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium">
+                    <label className={FORM_LABEL_CLASS}>
                       First name *
                     </label>
                     <input
                       type="text"
                       value={data.firstName}
                       onChange={(e) => update("firstName", e.target.value)}
-                      className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className={FORM_INPUT_CLASS}
                       placeholder="Alex"
                       autoFocus
                     />
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium">
+                    <label className={FORM_LABEL_CLASS}>
                       Email address *
                     </label>
                     <input
                       type="email"
                       value={data.email}
                       onChange={(e) => update("email", e.target.value)}
-                      className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className={FORM_INPUT_CLASS}
                       placeholder="alex@company.com"
                     />
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium">
+                    <label className={FORM_LABEL_CLASS}>
                       Phone number *
                     </label>
                     <input
                       type="tel"
                       value={data.phone}
                       onChange={(e) => update("phone", e.target.value)}
-                      className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className={FORM_INPUT_CLASS}
                       placeholder="+1 (555) 000-0000"
                     />
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium">
+                    <label className={FORM_LABEL_CLASS}>
                       How should we reach you? *
                     </label>
                     <div className="flex gap-2">
@@ -506,7 +359,7 @@ export function IntakeForm({ children }: { children: React.ReactNode }) {
                   <textarea
                     value={data.whyWork}
                     onChange={(e) => update("whyWork", e.target.value)}
-                    className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                    className={FORM_TEXTAREA_CLASS}
                     placeholder="Type your answer here..."
                     autoFocus
                   />
@@ -519,26 +372,26 @@ export function IntakeForm({ children }: { children: React.ReactNode }) {
                     Tell me about your business.
                   </h2>
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium">
+                    <label className={FORM_LABEL_CLASS}>
                       Business name *
                     </label>
                     <input
                       type="text"
                       value={data.bizName}
                       onChange={(e) => update("bizName", e.target.value)}
-                      className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className={FORM_INPUT_CLASS}
                       autoFocus
                     />
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium">
+                    <label className={FORM_LABEL_CLASS}>
                       Website URL (optional)
                     </label>
                     <input
                       type="url"
                       value={data.bizWebsite}
                       onChange={(e) => update("bizWebsite", e.target.value)}
-                      className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                      className={FORM_INPUT_CLASS}
                       placeholder="https://"
                     />
                   </div>
@@ -589,7 +442,7 @@ export function IntakeForm({ children }: { children: React.ReactNode }) {
                   <textarea
                     value={data.aiBranch}
                     onChange={(e) => update("aiBranch", e.target.value)}
-                    className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                    className={FORM_TEXTAREA_CLASS}
                     placeholder="Type your answer here..."
                     autoFocus
                   />
@@ -604,7 +457,7 @@ export function IntakeForm({ children }: { children: React.ReactNode }) {
                   <textarea
                     value={data.whatToBuild}
                     onChange={(e) => update("whatToBuild", e.target.value)}
-                    className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                    className={FORM_TEXTAREA_CLASS}
                     placeholder="Type your answer here..."
                     autoFocus
                   />
@@ -620,7 +473,7 @@ export function IntakeForm({ children }: { children: React.ReactNode }) {
                   <textarea
                     value={data.success}
                     onChange={(e) => update("success", e.target.value)}
-                    className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                    className={FORM_TEXTAREA_CLASS}
                     placeholder="Type your answer here..."
                     autoFocus
                   />
@@ -653,7 +506,7 @@ export function IntakeForm({ children }: { children: React.ReactNode }) {
                   <textarea
                     value={data.timelineBranch}
                     onChange={(e) => update("timelineBranch", e.target.value)}
-                    className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                    className={FORM_TEXTAREA_CLASS}
                     placeholder="Type your answer here..."
                     autoFocus
                   />
@@ -686,7 +539,7 @@ export function IntakeForm({ children }: { children: React.ReactNode }) {
                   <textarea
                     value={data.concerns}
                     onChange={(e) => update("concerns", e.target.value)}
-                    className="min-h-[120px] w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+                    className={FORM_TEXTAREA_CLASS}
                     placeholder="Type your answer here..."
                     autoFocus
                   />
