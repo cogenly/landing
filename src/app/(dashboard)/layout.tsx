@@ -1,8 +1,16 @@
 import { redirect } from "next/navigation";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { createClient } from "@/lib/supabase/server";
 import { AppSidebar } from "./app-sidebar";
+import { DashboardBreadcrumb } from "./breadcrumb";
+import {
+  HeaderActionsProvider,
+  HeaderActionsSlot,
+} from "./header-actions";
 
 export default async function DashboardLayout({
   children,
@@ -18,18 +26,20 @@ export default async function DashboardLayout({
     redirect("/auth/login");
   }
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-14 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <span className="text-sm font-medium text-muted-foreground">
-            Cogenly Platform
-          </span>
-        </header>
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8">{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
+    <HeaderActionsProvider>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border/50 bg-background/80 backdrop-blur-sm px-5 rounded-t-[inherit]">
+            <SidebarTrigger className="-ml-1" />
+            <DashboardBreadcrumb />
+            <div className="ml-auto">
+              <HeaderActionsSlot />
+            </div>
+          </header>
+          <main className="flex-1 overflow-y-auto p-5">{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
+    </HeaderActionsProvider>
   );
 }

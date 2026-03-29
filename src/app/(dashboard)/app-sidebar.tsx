@@ -1,15 +1,14 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  FolderOpen,
   Users,
-  Settings,
+  Phone,
   LogOut,
 } from "lucide-react";
-import { Logo } from "@/app/components/logo";
 import { logout } from "@/lib/auth/actions";
 import {
   Sidebar,
@@ -17,36 +16,50 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from "@/components/ui/sidebar";
 
 const navItems = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Projects", href: "/dashboard/projects", icon: FolderOpen },
   { label: "Clients", href: "/dashboard/clients", icon: Users },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings },
+  { label: "Calls", href: "/dashboard/calls", icon: Phone },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader>
-        <Link href="/dashboard" className="flex items-center gap-2 px-2 py-1">
-          <Logo size="sm" />
-        </Link>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" render={<Link href="/dashboard" />} className="gap-1.5">
+              <Image
+                src="/logo.png"
+                alt="Cogenly"
+                width={24}
+                height={24}
+                className="size-6 shrink-0"
+              />
+              <span
+                className="overflow-hidden whitespace-nowrap text-lg font-bold tracking-tighter transition-[width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0"
+                data-logo-text
+              >
+                cogenly
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-1">
               {navItems.map((item) => {
                 const isActive =
                   item.href === "/dashboard"
@@ -59,8 +72,9 @@ export function AppSidebar() {
                       isActive={isActive}
                       tooltip={item.label}
                       render={<Link href={item.href} />}
+                      className="h-10 [&_svg]:size-5"
                     >
-                      <item.icon />
+                      <item.icon className="text-sidebar-foreground/60" />
                       <span>{item.label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -77,13 +91,16 @@ export function AppSidebar() {
             <SidebarMenuButton
               tooltip="Sign out"
               onClick={() => logout()}
+              className="h-10 [&_svg]:size-5"
             >
-              <LogOut />
+              <LogOut className="text-red-500" />
               <span>Sign out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+
+      <SidebarRail />
     </Sidebar>
   );
 }
