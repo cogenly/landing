@@ -37,7 +37,7 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<Link href="/dashboard" />} className="gap-1.5">
+            <SidebarMenuButton size="lg" render={<Link href="/dashboard" />} className="gap-1.5 group-data-[collapsible=icon]:gap-0">
               <Image
                 src="/logo.png"
                 alt="Cogenly"
