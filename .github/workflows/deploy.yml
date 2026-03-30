@@ -28,7 +28,7 @@ jobs:
         run: bun run build
 
       - name: Build for Cloudflare (OpenNext)
-        run: bunx @opennextjs/cloudflare build
+        run: bun run build:worker
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
