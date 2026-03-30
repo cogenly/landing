@@ -98,6 +98,39 @@ export const faqs = [
   },
 ];
 
+export const caseStudies = [
+  {
+    slug: "law-firm-intake",
+    client: "Elite Law Group",
+    headline: "Automated intake workflows reduced document processing by 20 hours per week.",
+    industry: "Legal",
+    duration: "3 weeks",
+    bannerGradient: "from-blue-600 to-blue-800",
+    results: [
+      { value: "20", suffix: "hrs", label: "Saved per week" },
+      { value: "95", suffix: "%", label: "Accuracy" },
+      { value: "2", suffix: "days", label: "Faster intake" },
+      { value: "100", suffix: "%", label: "ROI in 3 months" },
+    ],
+    fullContent: {
+      challenge:
+        "The firm was manually reviewing and categorizing intake forms, spending 20+ hours weekly on data entry. This delayed case onboarding and created bottlenecks in their pipeline.",
+      approach:
+        "We built an automated workflow that reads intake forms, extracts key information, validates it, and routes cases to the correct attorney automatically.",
+      whatWeBuilt: [
+        "Document processing pipeline that extracts client info from forms",
+        "Validation rules to catch incomplete or invalid submissions",
+        "Automated routing based on practice area and case type",
+        "Integration with their case management system",
+        "Dashboard to monitor processing status",
+      ],
+      outcome:
+        "The firm now processes intake forms in minutes instead of hours. Their intake team focuses on follow-up and qualification instead of data entry. Cases reach attorneys 2 days faster on average.",
+    },
+    techStack: ["Document AI", "Workflow Automation", "Zapier", "API Integration"],
+  },
+];
+
 export const footerLinks = {
   product: [
     { label: "Services", href: "#services" },

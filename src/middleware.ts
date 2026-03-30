@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -29,7 +29,7 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protect dashboard routes — redirect to Google OAuth
+  // Protect dashboard routes — redirect to login
   if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
