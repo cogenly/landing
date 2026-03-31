@@ -137,7 +137,4 @@ export const footerLinks = {
     { label: "How It Works", href: "#how-it-works" },
     { label: "FAQ", href: "#faq" },
   ],
-  portal: [
-    { label: "Dashboard", href: "/dashboard" },
-  ],
 };

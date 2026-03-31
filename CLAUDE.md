@@ -4,7 +4,7 @@
 
 ## Agents
 
-- **supabase** (green) - all database work, migrations, server actions, queries
+- **notion** (green) - all Notion CRM ops: query clients, log calls, update pipeline, manage views
 - **frontend** (blue) - Next.js pages, components, UI, forms
 - **git** (white) - commits, branches, PRs
 - **playwright** (cyan) - screenshots, visual verification (only when explicitly asked)
@@ -18,15 +18,14 @@ Everything Cogenly lives here. Marketing site, client operations, integrations, 
 
 | Layer | Tool | Purpose |
 |-------|------|---------|
-| Platform | Next.js (this repo) | Marketing site + admin dashboard |
-| Data | Supabase | Clients, calls, intake submissions |
+| Platform | Next.js (this repo) | Marketing site + intake form |
+| CRM | Notion | Clients, calls, pipeline, playbooks |
 | Code | GitHub (`cogenly` org) | This repo + per-client repos |
 | Domain | Namecheap | cogenly.com |
 | DNS | Cloudflare | DNS + Workers + Pages via OpenNext |
 | Banking | Mercury | Business account + invoicing |
 | Registered Agent | Northwest Registered Agent | LLC / business registration |
 | Acquisition | LinkedIn | Outreach + content |
-| Playbooks | Notion | Sales framework, offer stack, call prep |
 | AI Brain | Claude Code | Orchestration, automation, glue |
 
 ### Repo Structure
@@ -34,22 +33,18 @@ Everything Cogenly lives here. Marketing site, client operations, integrations, 
 ```
 platform/
   CLAUDE.md
-  proxy.ts                 # Next.js 16 proxy (auth route protection)
   src/                     # Next.js app
     app/
-      (auth)/              # login/signup pages (admin-only, no public signup)
-      (dashboard)/         # admin dashboard (sidebar layout, protected)
-      auth/callback/       # Supabase auth callback handler
+      api/intake/          # POST endpoint: intake form -> Notion
+      book-a-call/         # multi-step intake form
       components/          # page sections (navbar, hero, services, etc.)
       fonts/               # Open Sauce Sans (local)
       page.tsx             # main landing page
     components/ui/         # shadcn + magic-ui primitives
     lib/
-      auth/actions.ts      # server actions: login, signup, logout
       data.ts              # all marketing copy
-      supabase/            # Supabase clients (browser + server)
-  supabase/
-    migrations/            # SQL schema migrations
+      notion.ts            # Notion client wrapper
+      scoring.ts           # lead scoring logic
   clients/                 # per-client docs
     <client-name>/
       README.md            # everything known about client
@@ -61,26 +56,30 @@ platform/
   public/                  # static assets (logo, etc.)
 ```
 
-### Supabase Schema
+### Notion Schema
 
-Tables: `clients`, `calls`, `profiles`
+**Clients Database** (ID: `333f446900f28003ac7df27e0873695f`)
 
-See `supabase/migrations/` for full schema. Key migrations:
-- `001_initial_schema.sql` - core business tables
-- `002_profiles.sql` - user profiles linked to Supabase Auth, auto-created on signup
-- `003_remove_projects_transcripts.sql` - removed projects, decisions tables and transcript_path from calls
-- `005_partial_intake.sql` - added 'partial' status for form tracking
-- `006_simplify_statuses.sql` - simplified to: partial, lead, client, churned
+Properties: Name (title), Email, Phone, Company, Website (URL), Industry, Status (select: partial/lead/client/churned), Preferred Contact (select)
 
 Client statuses: `partial` (started form), `lead` (completed form), `client` (active), `churned` (former client)
+
+**Applications Database** (ID: `334f446900f280bfb18aee0490d05c7c`)
+
+Properties: Name (title), Client (relation), Lead Score (number), Revenue (select), Team Size (select), Source (select), Timeline (select), Commitment (percent), Decision Maker (select), Hours Wasted (select), What to Build, Current Process, Why Work With Us, Success Criteria, Concerns, Anything Else, Score Breakdown, Metadata
+
+**Calls Database** (ID: `333f446900f28044bec3d4efb517bdb2`)
+
+Properties: Title, Client (relation), Date, Notes, Transcript
 
 ### What Lives Where
 
 | Data | Where | Why |
 |------|-------|-----|
-| Client info, status, pipeline | Supabase | Queryable, intake form writes here |
-| Call metadata (date, outcome) | Supabase `calls` table | Queryable |
-| Offers, sales framework | Notion | Low volume, already exists |
+| Client info, status, pipeline | Notion Clients DB | Lean CRM records |
+| Intake form submissions | Notion Applications DB | All form data, scoring, linked to clients |
+| Call log, transcripts | Notion Calls DB | Linked to clients |
+| Offers, sales framework | Notion | Same workspace as CRM |
 | Marketing copy | `src/lib/data.ts` | Edit copy here, not in components |
 
 ## The Business
@@ -95,16 +94,16 @@ Client statuses: `partial` (started form), `lead` (completed form), `client` (ac
 ```
 1. INTAKE
    Prospect fills form on cogenly.com/book-a-call
-   > Contact step creates partial record (status: partial)
+   > Contact step creates partial record in Notion (status: partial)
    > Full submission promotes to (status: lead) with lead score
 
 2. DISCOVERY CALL
-   > Log metadata to Supabase calls table
+   > Log call in Notion Calls DB, linked to client
 
 3. CLOSE & ONBOARD
    > Create client dir in clients/
    > Create cogenly/client-<name> repo from template
-   > Update Supabase status: client
+   > Update Notion status: client
    > Send Mercury invoice (setup fee)
 
 4. BUILD & DELIVER
@@ -112,23 +111,15 @@ Client statuses: `partial` (started form), `lead` (completed form), `client` (ac
 
 5. RETAIN
    > Monthly Mercury invoice (retainer)
-   > Check-in calls logged
+   > Check-in calls logged in Notion
    > If client leaves: update status to churned
 ```
-
-## Auth
-
-- Supabase Auth (email/password)
-- Admin-only login. No public signup. Create admin users via Supabase dashboard.
-- `profiles` table auto-created on signup with `role: 'client'` default. Set to `'admin'` manually.
-- `proxy.ts` protects `/dashboard/*` routes, redirects to `/login`
-- Logged-in users on `/login` get redirected to `/dashboard`
 
 ## Tech Stack (Site)
 
 - Next.js 16 (App Router) / React 19 / TypeScript
 - Tailwind CSS v4 / shadcn/ui v4 / MagicUI
-- Supabase (Auth + Postgres)
+- Notion API (local MCP via `@notionhq/notion-mcp-server`) for CRM
 - Font: Open Sauce Sans (local, `src/app/fonts/`) + Geist Mono (Google)
 - Package manager: **bun** (never npm)
 - Primary color: blue (`oklch(0.55 0.2 250)`)
@@ -155,7 +146,6 @@ Client statuses: `partial` (started form), `lead` (completed form), `client` (ac
 
 - Client dirs: lowercase, hyphenated (`clients/parsa/`)
 - Client repos: `client-<company-name>` in cogenly org (private)
-- Supabase is source of truth for structured data
+- Notion is source of truth for client/CRM data
 - Git is source of truth for documents
-- Notion only for personal playbooks (sales framework, offers). NOT for client data.
 - Mercury for all invoicing

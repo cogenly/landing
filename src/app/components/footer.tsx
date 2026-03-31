@@ -16,38 +16,20 @@ export function Footer() {
             </p>
           </div>
 
-          <div className="flex gap-16">
-            <div>
-              <h4 className="text-sm font-semibold">Product</h4>
-              <ul className="mt-4 space-y-2.5">
-                {footerLinks.product.map((link) => (
-                  <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-sm text-background/60 transition-colors hover:text-background"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-semibold">Portal</h4>
-              <ul className="mt-4 space-y-2.5">
-                {footerLinks.portal.map((link) => (
-                  <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-sm text-background/60 transition-colors hover:text-background"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div>
+            <h4 className="text-sm font-semibold">Product</h4>
+            <ul className="mt-4 space-y-2.5">
+              {footerLinks.product.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    className="text-sm text-background/60 transition-colors hover:text-background"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
 
         </div>

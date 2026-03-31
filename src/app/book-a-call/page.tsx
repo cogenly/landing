@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { Logo } from "../components/logo";
 import Link from "next/link";
-import { submitIntake, createPartialClient } from "./actions";
 import {
   TEAM_SIZE_BRANCH_QUESTIONS,
   AI_BRANCH_QUESTIONS,
@@ -257,14 +256,21 @@ export default function BookACallPage() {
     if (!validate()) return;
     const nextStep = nav.getNextStep(step);
     if (step === "contact") {
-      createPartialClient({
-        firstName: data.firstName,
-        email: data.email,
-        phone: data.phone,
-        contactMethod: data.contactMethod,
-      }).then((result) => {
-        if ("clientId" in result && result.clientId) setClientId(result.clientId);
-      });
+      fetch("/api/intake", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "createPartial",
+          firstName: data.firstName,
+          email: data.email,
+          phone: data.phone,
+          contactMethod: data.contactMethod,
+        }),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          if (result.clientId) setClientId(result.clientId);
+        });
     }
     if (nextStep === "done") {
       setSubmitting(true);
@@ -279,7 +285,17 @@ export default function BookACallPage() {
         screenHeight: window.screen.height,
         url: window.location.href,
       };
-      const result = await submitIntake(data, metadata, clientId ?? undefined);
+      const res = await fetch("/api/intake", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "submitIntake",
+          formData: data,
+          metadata,
+          clientId: clientId ?? undefined,
+        }),
+      });
+      const result = await res.json();
       setSubmitting(false);
       if (result.error) {
         setSubmitError(result.error);
