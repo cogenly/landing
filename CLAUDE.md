@@ -66,7 +66,7 @@ Client statuses: `partial` (started form), `lead` (completed form), `client` (ac
 
 **Applications Database** (ID: `334f446900f280bfb18aee0490d05c7c`)
 
-Properties: Name (title), Client (relation), Lead Score (number), Revenue (select), Team Size (select), Source (select), Timeline (select), Commitment (percent), Decision Maker (select), Hours Wasted (select), What to Build, Current Process, Why Work With Us, Success Criteria, Concerns, Anything Else, Score Breakdown, Metadata
+Properties: Name (title), Email, Phone, Company, Website (URL), Industry, Preferred Contact (select), Lead Score (number), Revenue (select), Team Size (select), Source (select), Timeline (select), Commitment (percent), Decision Maker (select), Hours Wasted (select), What to Build, Current Process, Why Work With Us, Success Criteria, Concerns, Anything Else, Score Breakdown, Metadata, Source Detail, AI Experience, AI Detail, Team Size Detail, Hours Wasted Detail, Decision Maker Detail, Timeline Detail
 
 **Calls Database** (ID: `333f446900f28044bec3d4efb517bdb2`)
 
@@ -76,8 +76,8 @@ Properties: Title, Client (relation), Date, Notes, Transcript
 
 | Data | Where | Why |
 |------|-------|-----|
-| Client info, status, pipeline | Notion Clients DB | Lean CRM records |
-| Intake form submissions | Notion Applications DB | All form data, scoring, linked to clients |
+| Client info, status, pipeline | Notion Clients DB | Manually created when converting an application |
+| Intake form submissions | Notion Applications DB | All form data, scoring, contact info |
 | Call log, transcripts | Notion Calls DB | Linked to clients |
 | Offers, sales framework | Notion | Same workspace as CRM |
 | Marketing copy | `src/lib/data.ts` | Edit copy here, not in components |
@@ -94,8 +94,8 @@ Properties: Title, Client (relation), Date, Notes, Transcript
 ```
 1. INTAKE
    Prospect fills form on cogenly.com/book-a-call
-   > Contact step creates partial record in Notion (status: partial)
-   > Full submission promotes to (status: lead) with lead score
+   > Submission creates record in Applications DB with lead score
+   > Alex reviews and manually converts to Client if interested
 
 2. DISCOVERY CALL
    > Log call in Notion Calls DB, linked to client

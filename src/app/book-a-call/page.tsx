@@ -174,7 +174,6 @@ function isValidPhone(phone: string): boolean {
 
 export default function BookACallPage() {
   const [step, setStep] = useState<Step>("intro");
-  const [clientId, setClientId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
@@ -255,23 +254,6 @@ export default function BookACallPage() {
   const next = async () => {
     if (!validate()) return;
     const nextStep = nav.getNextStep(step);
-    if (step === "contact") {
-      fetch("/api/intake", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "createPartial",
-          firstName: data.firstName,
-          email: data.email,
-          phone: data.phone,
-          contactMethod: data.contactMethod,
-        }),
-      })
-        .then((res) => res.json())
-        .then((result) => {
-          if (result.clientId) setClientId(result.clientId);
-        });
-    }
     if (nextStep === "done") {
       setSubmitting(true);
       setSubmitError(null);
@@ -288,12 +270,7 @@ export default function BookACallPage() {
       const res = await fetch("/api/intake", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "submitIntake",
-          formData: data,
-          metadata,
-          clientId: clientId ?? undefined,
-        }),
+        body: JSON.stringify({ formData: data, metadata }),
       });
       const result = await res.json();
       setSubmitting(false);

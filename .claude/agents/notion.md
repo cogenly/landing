@@ -21,9 +21,9 @@ Do NOT use `mcp__claude_ai_Notion__*` tools (those connect to a different worksp
   - Lean CRM records, no intake data here
 
 - **Applications**: `334f446900f280bfb18aee0490d05c7c`
-  - Properties: Name, Client (relation), Lead Score, Revenue, Team Size, Source, Timeline, Commitment, Decision Maker, Hours Wasted, What to Build, Current Process, Why Work With Us, Success Criteria, Concerns, Anything Else, Score Breakdown, Metadata
-  - Linked to Clients DB via the Client relation
-  - Created by the intake form on submit
+  - Properties: Name, Email, Phone, Company, Website, Industry, Preferred Contact, Lead Score, Revenue, Team Size, Source, Timeline, Commitment, Decision Maker, Hours Wasted, What to Build, Current Process, Why Work With Us, Success Criteria, Concerns, Anything Else, Score Breakdown, Metadata, Source Detail, AI Experience, AI Detail, Team Size Detail, Hours Wasted Detail, Decision Maker Detail, Timeline Detail
+  - Standalone (not linked to Clients). Alex manually converts to client.
+  - Created automatically by the intake form on submit
 
 - **Calls**: `333f446900f28044bec3d4efb517bdb2`
   - Properties: Name, Client (relation to Clients), Date, Notes, Transcript
