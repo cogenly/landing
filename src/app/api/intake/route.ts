@@ -60,7 +60,7 @@ async function handleCreatePartial(body: {
       filter: {
         and: [
           { property: "Email", email: { equals: body.email } },
-          { property: "Status", select: { equals: "partial" } },
+          { property: "Status", select: { equals: "Partial" } },
         ],
       },
     }),
@@ -81,7 +81,7 @@ async function handleCreatePartial(body: {
         Email: { email: body.email },
         Phone: { phone_number: body.phone },
         "Preferred Contact": { select: { name: body.contactMethod } },
-        Status: { select: { name: "partial" } },
+        Status: { select: { name: "Partial" } },
       },
     }),
   });
@@ -105,7 +105,7 @@ async function handleSubmitIntake(body: {
     "Preferred Contact": { select: { name: formData.contactMethod } },
     "Lead Score": { number: leadScore },
     Source: { select: { name: SOURCE_MAP[formData.howFound] ?? formData.howFound } },
-    Status: { select: { name: "submitted" } },
+    Status: { select: { name: "Submitted" } },
     "Score Breakdown": richText(JSON.stringify(scoreBreakdown)),
   };
 

@@ -60,13 +60,13 @@ platform/
 
 **Clients Database** (ID: `333f446900f28003ac7df27e0873695f`)
 
-Properties: Name (title), Email, Phone, Company, Website (URL), Industry, Status (select: partial/lead/client/churned), Preferred Contact (select)
+Properties: Name (title), Email, Phone, Company, Website (URL), Description, Status (select: Lead/Client/Churned), Preferred Contact (select)
 
-Client statuses: `partial` (started form), `lead` (completed form), `client` (active), `churned` (former client)
+Client statuses: `Lead` (qualified prospect), `Client` (active), `Churned` (former client)
 
 **Applications Database** (ID: `334f446900f280bfb18aee0490d05c7c`)
 
-Properties: Name (title), Email, Phone, Company, Website (URL), Industry, Preferred Contact (select), Lead Score (number), Revenue (select), Team Size (select), Source (select), Timeline (select), Commitment (percent), Decision Maker (select), Hours Wasted (select), What to Build, Current Process, Why Work With Us, Success Criteria, Concerns, Anything Else, Score Breakdown, Metadata, Source Detail, AI Experience, AI Detail, Team Size Detail, Hours Wasted Detail, Decision Maker Detail, Timeline Detail
+Properties: Name (title), Email, Phone, Company, Website (URL), Industry, Preferred Contact (select), Status (select: Partial/Submitted), Lead Score (number), Revenue (select), Team Size (select), Source (select), Timeline (select), Commitment (percent), Decision Maker (select), Hours Wasted (select), What to Build, Current Process, Why Work With Us, Success Criteria, Concerns, Anything Else, Score Breakdown, Metadata, Source Detail, AI Experience, AI Detail, Team Size Detail, Hours Wasted Detail, Decision Maker Detail, Timeline Detail
 
 **Calls Database** (ID: `333f446900f28044bec3d4efb517bdb2`)
 
